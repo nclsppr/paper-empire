@@ -23,6 +23,8 @@
       text-size-adjust: 100%;
       touch-action: manipulation;
       scroll-behavior: smooth;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     * {
@@ -95,14 +97,13 @@
     }
 
     .app {
-      width: 100%;
-      max-width: 1200px;
+      width: min(100%, 1200px);
+      margin: 12px auto 32px;
       padding: clamp(12px, 4vw, 24px);
       box-sizing: border-box;
       display: grid;
       grid-template-columns: 1.2fr 1.3fr 1.1fr;
       gap: clamp(12px, 3vw, 20px);
-      margin-top: 12px;
     }
 
     .card {
@@ -526,12 +527,11 @@
     }
 
     @media (max-width: 960px) {
-      body {
-        justify-content: flex-start;
-      }
       .app {
         grid-template-columns: 1fr;
-        gap: 12px;
+        gap: 16px;
+        padding: 20px;
+        margin-top: 8px;
       }
       .buildings-list,
       .upgrades-list {
@@ -548,6 +548,10 @@
         font-size: 14px;
         --text-base: 14px;
         --heading-size: 18px;
+      }
+      .header-inner {
+        text-align: center;
+        align-items: center;
       }
       .click-button {
         font-size: 15px;
@@ -576,9 +580,4 @@
       margin-top: 4px;
     }
 
-    @media (max-width: 900px) {
-      .app {
-        grid-template-columns: 1fr;
-      }
-    }
   

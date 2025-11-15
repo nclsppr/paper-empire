@@ -306,7 +306,7 @@
 
   /** Applies text labels to every DOM node declaring data-i18n. */
   function applyStaticTranslations() {
-    document.title = t("app.browserTitle");
+    document.title = GAME_TITLE;
     document.documentElement.lang = currentLang;
     document.querySelectorAll("[data-i18n]").forEach(el => {
       const key = el.getAttribute("data-i18n");
