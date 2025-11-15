@@ -18,3 +18,10 @@ Track meaningful milestones in the project:
 - **0.6** – Externalise i18n, add German/Luxembourgish, refresh the mobile UI (sticky header, ripple, layout fixes), and add Playwright layout tests. See `RELEASE_NOTES.md` for details.
 
 When you make notable changes (new features, mechanics, UI improvements), append a new entry with an incremented version number and a short description of what changed.
+
+## SEO & Deployment
+
+- `index.html` now embarques canonical/meta tags, Open Graph/Twitter cards, and JSON-LD schema data to help Google understand the app.
+- `robots.txt` (root) allows crawling and points to `sitemap.xml`, which currently indexes the main game (`/`) and the Retype docs (`/docs/`).
+- A dedicated social card is stored at `assets/images/social-card.svg` and referenced in Open Graph/Twitter meta tags.
+- The GitHub Actions workflow (`.github/workflows/docs.yml`) builds the docs, bundles the game assets, copies `robots.txt`/`sitemap.xml`, and deploys everything via GitHub Pages (Pages source = GitHub Actions).

@@ -29,6 +29,8 @@ jobs:
         run: |
           mkdir -p site/docs
           cp index.html site/index.html
+          cp robots.txt site/robots.txt
+          cp sitemap.xml site/sitemap.xml
           cp -R assets site/assets
           cp -R docs-site/. site/docs/
       - uses: actions/upload-pages-artifact@v3
