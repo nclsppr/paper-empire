@@ -11,6 +11,18 @@
   const { computeBuildingEffects, getBuildingImpact } = ModifierUtils;
   const { sanitizeTimeScale, updateCheatProgress } = GodModeUtils;
   const Events = window.Events;
+  const Settings = window.Settings;
+  const TutorialEngine = window.Tutorial;
+  const UIEffects = window.UIEffects || {
+    playPurchaseEffect() {},
+    playCelebrationEffect() {},
+    playClickEffect() {},
+    playSound() {}
+  };
+  const settingsState = {
+    activeTab: "accessibility",
+    lastTrigger: null
+  };
 
   // -------------------------------
   // Internationalisation + état UI
@@ -66,7 +78,8 @@
   const eventState = {
     modalCanClose: false,
     bannerTone: "mixed",
-    bannerKey: null
+    bannerKey: null,
+    bannerParams: null
   };
 
   const contractsState = {
@@ -74,8 +87,11 @@
     rerollCount: 0,
     lastReroll: 0
   };
+  const CONTRACT_REROLL_COOLDOWN = 30000;
 
   let saveTimer = null;
+  let bannerHideTimer = null;
+  let persistenceDisabled = false;
 
   /** Static blueprint for every building available in the MVP. */
   const BUILDING_DEFS = [
@@ -234,6 +250,14 @@
     }
   ];
 
+  const finalBuildingDef = BUILDING_DEFS.reduce((best, def) => {
+    if (!best) return def;
+    const bestCost = best.baseCost || 0;
+    const defCost = def.baseCost || 0;
+    return defCost > bestCost ? def : best;
+  }, BUILDING_DEFS[0]);
+  const FINAL_BUILDING_ID = finalBuildingDef ? finalBuildingDef.id : BUILDING_DEFS[0] ? BUILDING_DEFS[0].id : null;
+
   const GOD_MODE_SCALES = [1, 10, 100, 1000];
   const godModeState = {
     unlocked: false,
@@ -252,6 +276,7 @@
     initLocalization();
     initGame();
     initGodModeControls();
+    initTutorialGuidance();
   }
 
   /** Stores every frequently used DOM node locally for fast access. */
@@ -275,14 +300,27 @@
     DOM.buildingsList = document.getElementById("buildingsList");
     DOM.upgradesList = document.getElementById("upgradesList");
     DOM.logPanel = document.getElementById("logPanel");
+    DOM.contractsTab = document.getElementById("contractsTab");
+    DOM.journalTab = document.getElementById("journalTab");
+    DOM.contractsPanel = document.getElementById("contractsPanel");
+    DOM.journalPanel = document.getElementById("journalPanel");
+    DOM.rerollContractsBtn = document.getElementById("rerollContractsBtn");
     DOM.godModeCard = document.getElementById("godModeCard");
     DOM.godModeStatus = document.getElementById("godModeStatus");
     DOM.achievementsList = document.getElementById("achievementsList");
     DOM.exportSaveBtn = document.getElementById("exportSaveBtn");
     DOM.importSaveBtn = document.getElementById("importSaveBtn");
     DOM.resetSaveBtn = document.getElementById("resetSaveBtn");
+    DOM.settingsModal = document.getElementById("settingsModal");
+    DOM.settingsDialog = DOM.settingsModal ? DOM.settingsModal.querySelector(".settings-dialog") : null;
+    DOM.settingsTabs = document.querySelectorAll("[data-settings-tab]");
+    DOM.settingsSections = document.querySelectorAll("[data-settings-section]");
+    DOM.settingsTriggers = document.querySelectorAll("[data-open-settings]");
+    DOM.closeSettingsBtn = document.getElementById("closeSettingsBtn");
+    DOM.restartTutorialBtn = document.getElementById("restartTutorialBtn");
     DOM.eventBanner = document.getElementById("eventBanner");
     DOM.eventBannerText = document.getElementById("eventBannerText");
+    DOM.eventBannerEmoji = document.getElementById("eventBannerEmoji");
     DOM.closeEventBanner = document.getElementById("closeEventBanner");
     DOM.eventModal = document.getElementById("eventModal");
     DOM.eventTitle = document.getElementById("eventTitle");
@@ -320,6 +358,33 @@
       DOM.resetSaveBtn.addEventListener("click", handleResetSave);
     }
 
+    if (DOM.settingsTriggers && DOM.settingsTriggers.length) {
+      DOM.settingsTriggers.forEach(btn => {
+        btn.addEventListener("click", event => {
+          settingsState.lastTrigger = event.currentTarget;
+          openSettingsModal();
+        });
+      });
+    }
+    if (DOM.closeSettingsBtn) {
+      DOM.closeSettingsBtn.addEventListener("click", () => closeSettingsModal());
+    }
+    if (DOM.settingsModal) {
+      DOM.settingsModal.addEventListener("click", event => {
+        if (event.target === DOM.settingsModal) {
+          closeSettingsModal();
+        }
+      });
+    }
+    if (DOM.settingsTabs && DOM.settingsTabs.length) {
+      DOM.settingsTabs.forEach(tab => {
+        tab.addEventListener("click", () => activateSettingsTab(tab.getAttribute("data-settings-tab")));
+      });
+    }
+    if (DOM.restartTutorialBtn) {
+      DOM.restartTutorialBtn.addEventListener("click", handleRestartTutorial);
+    }
+
     if (DOM.eventChoices) {
       DOM.eventChoices.addEventListener("click", handleEventChoiceClick);
     }
@@ -329,13 +394,18 @@
     if (DOM.closeEventModal) {
       DOM.closeEventModal.addEventListener("click", () => closeEventModal());
     }
-    document.addEventListener("keydown", evt => {
-      if (evt.key === "Escape") {
-        closeEventModal(true);
-      }
-    });
     if (DOM.closeEventBanner) {
       DOM.closeEventBanner.addEventListener("click", hideEventBanner);
+    }
+
+    if (DOM.contractsTab) {
+      DOM.contractsTab.addEventListener("click", () => switchDetailTab("contracts"));
+    }
+    if (DOM.journalTab) {
+      DOM.journalTab.addEventListener("click", () => switchDetailTab("journal"));
+    }
+    if (DOM.rerollContractsBtn) {
+      DOM.rerollContractsBtn.addEventListener("click", handleContractsReroll);
     }
 
     document.addEventListener("click", event => {
@@ -344,11 +414,107 @@
       }
     });
 
-    document.addEventListener("keydown", event => {
-      if (event.key === "Escape") {
-        hideAllTooltips();
+    document.addEventListener("keydown", handleGlobalKeydown);
+
+    switchDetailTab("contracts");
+  }
+
+  function handleGlobalKeydown(event) {
+    if (event.key !== "Escape") return;
+    if (TutorialEngine && typeof TutorialEngine.isActive === "function" && TutorialEngine.isActive()) {
+      if (typeof TutorialEngine.skip === "function") {
+        TutorialEngine.skip(true);
       }
-    });
+      event.preventDefault();
+      return;
+    }
+    if (closeEventModal(true)) {
+      event.preventDefault();
+      return;
+    }
+    if (closeSettingsModal()) {
+      event.preventDefault();
+      return;
+    }
+    hideAllTooltips();
+  }
+
+  function openSettingsModal(section) {
+    if (!DOM.settingsModal) return;
+    const targetTab = section || settingsState.activeTab || "accessibility";
+    DOM.settingsModal.classList.remove("hidden");
+    DOM.settingsModal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+    activateSettingsTab(targetTab);
+    if (Settings && typeof Settings.refresh === "function") {
+      Settings.refresh();
+    }
+    if (DOM.settingsDialog) {
+      DOM.settingsDialog.setAttribute("tabindex", "-1");
+      DOM.settingsDialog.focus();
+    }
+    if (TutorialEngine && typeof TutorialEngine.markMilestone === "function") {
+      TutorialEngine.markMilestone("settings");
+    }
+  }
+
+  function closeSettingsModal(restoreFocus = true) {
+    if (!DOM.settingsModal || DOM.settingsModal.classList.contains("hidden")) {
+      return false;
+    }
+    DOM.settingsModal.classList.add("hidden");
+    DOM.settingsModal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+    if (restoreFocus && settingsState.lastTrigger && typeof settingsState.lastTrigger.focus === "function") {
+      settingsState.lastTrigger.focus();
+      settingsState.lastTrigger = null;
+    }
+    return true;
+  }
+
+  function activateSettingsTab(section) {
+    if (!section) return;
+    settingsState.activeTab = section;
+    if (DOM.settingsTabs && DOM.settingsTabs.length) {
+      DOM.settingsTabs.forEach(tab => {
+        const match = tab.getAttribute("data-settings-tab") === section;
+        tab.classList.toggle("active", match);
+        tab.setAttribute("aria-selected", match ? "true" : "false");
+      });
+    }
+    if (DOM.settingsSections && DOM.settingsSections.length) {
+      DOM.settingsSections.forEach(sectionEl => {
+        const match = sectionEl.getAttribute("data-settings-section") === section;
+        sectionEl.classList.toggle("hidden", !match);
+      });
+    }
+  }
+
+  function switchDetailTab(tab) {
+    if (!DOM.contractsPanel || !DOM.journalPanel) return;
+    const showContracts = tab !== "journal";
+    DOM.contractsPanel.classList.toggle("hidden", !showContracts);
+    DOM.journalPanel.classList.toggle("hidden", showContracts);
+    if (DOM.contractsTab) {
+      DOM.contractsTab.classList.toggle("active", showContracts);
+      DOM.contractsTab.setAttribute("aria-selected", showContracts ? "true" : "false");
+    }
+    if (DOM.journalTab) {
+      DOM.journalTab.classList.toggle("active", !showContracts);
+      DOM.journalTab.setAttribute("aria-selected", !showContracts ? "true" : "false");
+    }
+    if (!showContracts && TutorialEngine && typeof TutorialEngine.markMilestone === "function") {
+      TutorialEngine.markMilestone("journal");
+    }
+  }
+
+  function handleRestartTutorial() {
+    if (!Settings || !TutorialEngine) return;
+    Settings.setPreference("tutorialEnabled", true);
+    Settings.setPreference("tutorialCompleted", false);
+    if (typeof TutorialEngine.restart === "function") {
+      TutorialEngine.restart();
+    }
   }
 
   /** Simple translation helper that handles string interpolation. */
@@ -374,9 +540,19 @@
       const key = el.getAttribute("data-i18n");
       el.textContent = t(key);
     });
+    if (DOM.langSelect) {
+      DOM.langSelect.setAttribute("aria-label", t("actions.languageLabel"));
+    }
+    if (DOM.closeEventBanner) {
+      DOM.closeEventBanner.setAttribute("aria-label", t("actions.closeBanner"));
+    }
+    if (DOM.closeEventModal) {
+      DOM.closeEventModal.setAttribute("aria-label", t("actions.close"));
+    }
     applyGameTitle();
     renderGodModePanel(true);
     renderAchievementsPanel();
+    refreshEventBanner();
   }
 
   function applyGameTitle() {
@@ -414,12 +590,21 @@
       alert(t("actions.importError"));
       return;
     }
+    disablePersistence();
     location.reload();
   }
 
   function handleResetSave() {
     if (!confirm(t("actions.resetConfirm"))) return;
-    Persistence.clear && Persistence.clear();
+    disablePersistence();
+    if (Persistence && typeof Persistence.clear === "function") {
+      Persistence.clear();
+    }
+    try {
+      window.localStorage.removeItem("pe-accessibility");
+    } catch {
+      // ignore storage errors
+    }
     location.reload();
   }
 
@@ -451,6 +636,47 @@
       });
     }
     applyStaticTranslations();
+  }
+
+  function initTutorialGuidance() {
+    if (!TutorialEngine || !Settings) return;
+    const steps = [
+      {
+        id: "click",
+        titleKey: "tutorial.step.click.title",
+        bodyKey: "tutorial.step.click.body",
+        selector: "#clickButton",
+        milestone: "click"
+      },
+      {
+        id: "building",
+        titleKey: "tutorial.step.building.title",
+        bodyKey: "tutorial.step.building.body",
+        selector: "#buildingsList",
+        milestone: "building"
+      },
+      {
+        id: "journal",
+        titleKey: "tutorial.step.journal.title",
+        bodyKey: "tutorial.step.journal.body",
+        selector: "#journalTab",
+        milestone: "journal"
+      },
+      {
+        id: "settings",
+        titleKey: "tutorial.step.settings.title",
+        bodyKey: "tutorial.step.settings.body",
+        selector: "#settingsGearButton",
+        milestone: "settings"
+      }
+    ];
+    TutorialEngine.configure({
+      steps,
+      translate: t,
+      settings: Settings,
+      onComplete: () => logMessage("log.tutorialComplete"),
+      autoStart: true
+    });
   }
 
   /** Initialises the building deck, upgrades and kicks off the loop. */
@@ -500,7 +726,7 @@
     applyPersistedState(Persistence.load ? Persistence.load() : null);
 
     if (window.EndgameModule) {
-      window.EndgameModule.loadData().then(() => {
+      window.EndgameModule.loadData(gameState).then(() => {
         renderContractsPanel();
       });
     }
@@ -555,6 +781,7 @@
   }
 
   function queueSave(force = false) {
+    if (persistenceDisabled) return;
     if (!Persistence.isAvailable || !Persistence.isAvailable()) return;
     if (force) {
       if (saveTimer) clearTimeout(saveTimer);
@@ -567,6 +794,14 @@
       Persistence.save(buildPersistedState());
       saveTimer = null;
     }, 500);
+  }
+
+  function disablePersistence() {
+    persistenceDisabled = true;
+    if (saveTimer) {
+      clearTimeout(saveTimer);
+      saveTimer = null;
+    }
   }
 
   /** Formats numbers following simple thresholds for readability. */
@@ -781,6 +1016,7 @@
     refreshUpgradeUnlocks();
     maybeSpawnSmallEvents(dt);
     checkDynamicEvents(dt);
+    tickContracts(dt);
     checkAchievements();
     queueSave();
   }
@@ -821,16 +1057,21 @@
       DOM.clickButton.classList.add("pulse");
       setTimeout(() => DOM.clickButton && DOM.clickButton.classList.remove("pulse"), 350);
     }
+    UIEffects.playClickEffect(DOM.clickButton);
+    if (TutorialEngine && typeof TutorialEngine.markMilestone === "function") {
+      TutorialEngine.markMilestone("click");
+    }
   }
 
   /** Purchases a building if the player can afford it. */
-  function buyBuilding(id) {
+  function buyBuilding(id, sourceEl) {
     const b = gameState.buildings.find(x => x.id === id);
     if (!b) return;
     const cost = buildingCost(b);
     if (gameState.resources.docBank < cost) return;
 
     gameState.resources.docBank -= cost;
+    const previousQuantity = b.quantity;
     b.quantity += 1;
     uiState.buildingsDirty = true;
     logMessage("log.buyBuilding", { name: getBuildingName(b), total: b.quantity });
@@ -838,6 +1079,14 @@
     checkAchievements();
     queueSave();
     renderAll();
+    UIEffects.playPurchaseEffect(sourceEl || DOM.buildingsList);
+    if (TutorialEngine && typeof TutorialEngine.markMilestone === "function") {
+      TutorialEngine.markMilestone("building");
+    }
+    if (FINAL_BUILDING_ID && b.id === FINAL_BUILDING_ID && previousQuantity === 0) {
+      UIEffects.playCelebrationEffect();
+      logMessage("log.finalBuilding", { name: getBuildingName(b) });
+    }
   }
 
   /** Purchases an upgrade if affordable and unlocked. */
@@ -958,19 +1207,63 @@
 
   function showEventBanner(key, tone = "mixed", params = {}) {
     if (!DOM.eventBanner) return;
-    DOM.eventBanner.classList.remove("hidden", "banner-positive", "banner-mixed", "banner-negative");
-    const cls = tone === "positive" ? "banner-positive" : tone === "negative" ? "banner-negative" : "banner-mixed";
-    DOM.eventBanner.classList.add(cls);
     eventState.bannerTone = tone;
     eventState.bannerKey = key;
-    DOM.eventBannerText.textContent = t(key, params);
+    eventState.bannerParams = params || {};
+    refreshEventBanner();
+    if (bannerHideTimer) {
+      clearTimeout(bannerHideTimer);
+      bannerHideTimer = null;
+    }
+    DOM.eventBanner.classList.remove("hidden");
+    requestAnimationFrame(() => {
+      if (DOM.eventBanner) {
+        DOM.eventBanner.classList.add("banner-visible");
+      }
+    });
   }
 
   function hideEventBanner() {
-    if (!DOM.eventBanner) return;
-    DOM.eventBanner.classList.add("hidden");
-    DOM.eventBannerText.textContent = "";
+    if (!DOM.eventBanner || DOM.eventBanner.classList.contains("hidden")) return;
+    DOM.eventBanner.classList.remove("banner-visible");
     eventState.bannerKey = null;
+    eventState.bannerParams = null;
+    eventState.bannerTone = "mixed";
+    refreshEventBanner();
+    if (bannerHideTimer) {
+      clearTimeout(bannerHideTimer);
+    }
+    bannerHideTimer = setTimeout(() => {
+      if (DOM.eventBanner && !DOM.eventBanner.classList.contains("banner-visible")) {
+        DOM.eventBanner.classList.add("hidden");
+      }
+    }, 280);
+  }
+
+  function refreshEventBanner() {
+    if (!DOM.eventBanner) return;
+    DOM.eventBanner.classList.remove("banner-positive", "banner-mixed", "banner-negative");
+    if (!eventState.bannerKey) {
+      if (DOM.eventBannerText) DOM.eventBannerText.textContent = "";
+      if (DOM.eventBannerEmoji) DOM.eventBannerEmoji.textContent = "";
+      return;
+    }
+    const tone = eventState.bannerTone || "mixed";
+    const cls = tone === "positive" ? "banner-positive" : tone === "negative" ? "banner-negative" : "banner-mixed";
+    DOM.eventBanner.classList.add(cls);
+    const text = t(eventState.bannerKey, eventState.bannerParams || {});
+    if (DOM.eventBannerText) {
+      DOM.eventBannerText.textContent = text;
+    }
+    if (DOM.eventBannerEmoji) {
+      DOM.eventBannerEmoji.textContent = getBannerEmoji(tone);
+    }
+  }
+
+  function getBannerEmoji(tone) {
+    if (tone === "positive") return "✨";
+    if (tone === "negative") return "⚠️";
+    return "🔔";
   }
 
   function checkDynamicEvents(dt) {
@@ -985,7 +1278,6 @@
   function handleEventSpawn(eventDef) {
     eventState.active = eventDef;
     eventState.modalCanClose = false;
-    addNewsEntry(eventDef.titleKey);
     showEventModal(eventDef);
   }
 
@@ -1024,10 +1316,11 @@
   }
 
   function closeEventModal(force = false) {
-    if (!DOM.eventModal || DOM.eventModal.classList.contains("hidden")) return;
-    if (!eventState.modalCanClose && !force) return;
+    if (!DOM.eventModal || DOM.eventModal.classList.contains("hidden")) return false;
+    if (!eventState.modalCanClose && !force) return false;
     DOM.eventModal.classList.add("hidden");
     DOM.eventModal.setAttribute("aria-hidden", "true");
+    return true;
   }
 
   function handleEventChoiceClick(event) {
@@ -1048,6 +1341,7 @@
   }
 
   function renderContractsPanel() {
+    updateRerollButton();
     if (!window.EndgameModule) return;
     if (!DOM.contractsList || !DOM.activeContractPanel) return;
     contractsState.available = window.EndgameModule.availableContracts(gameState);
@@ -1089,13 +1383,16 @@
 
   function startContract(contractId) {
     if (!window.EndgameModule) return;
-    const success = window.EndgameModule.startContract(contractId);
-    if (!success) {
-      alert(t("contracts.alreadyRunning"));
+    const result = window.EndgameModule.startContract(contractId, gameState);
+    if (!result || !result.ok) {
+      const key = result && result.error === "requirements" ? "contracts.requirementsNotMet" : "contracts.alreadyRunning";
+      alert(t(key));
       return;
     }
-    logMessage("log.contractStart", { name: t(window.EndgameModule.activeContract.current.nameKey) });
+    logMessage("log.contractStart", { name: t(result.contract.nameKey) });
     renderActiveContract();
+    queueSave(true);
+    renderContractsPanel();
   }
 
   function renderActiveContract() {
@@ -1126,9 +1423,42 @@
       showEventBanner("contracts.banner.completed", "positive", { name: t(result.nameKey) });
       renderActiveContract();
       queueSave(true);
+      renderContractsPanel();
     } else {
       renderActiveContract();
     }
+  }
+
+  function handleContractsReroll() {
+    if (!window.EndgameModule || !canRerollContracts()) return;
+    window.EndgameModule.rerollContracts(gameState);
+    contractsState.lastReroll = performance.now();
+    contractsState.rerollCount += 1;
+    renderContractsPanel();
+  }
+
+  function canRerollContracts() {
+    if (!contractsState.lastReroll) return true;
+    return performance.now() - contractsState.lastReroll >= CONTRACT_REROLL_COOLDOWN;
+  }
+
+  function updateRerollButton() {
+    if (!DOM.rerollContractsBtn) return;
+    if (!window.EndgameModule) {
+      DOM.rerollContractsBtn.disabled = true;
+      return;
+    }
+    if (canRerollContracts()) {
+      DOM.rerollContractsBtn.disabled = false;
+      DOM.rerollContractsBtn.textContent = t("actions.rerollContracts");
+      return;
+    }
+    const elapsed = performance.now() - contractsState.lastReroll;
+    const remaining = Math.max(0, CONTRACT_REROLL_COOLDOWN - elapsed);
+    DOM.rerollContractsBtn.disabled = true;
+    DOM.rerollContractsBtn.textContent = t("contracts.rerollCountdown", {
+      seconds: Math.max(1, Math.ceil(remaining / 1000))
+    });
   }
 
   function handleMinigameResponse(event) {
@@ -1327,7 +1657,7 @@
       btn.className = "btn-buy";
       btn.dataset.buildingBtn = b.id;
       btn.textContent = t("actions.buy");
-      btn.addEventListener("click", () => buyBuilding(b.id));
+      btn.addEventListener("click", () => buyBuilding(b.id, btn));
 
       buy.appendChild(costEl);
       buy.appendChild(btn);

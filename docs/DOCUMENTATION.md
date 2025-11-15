@@ -1,77 +1,94 @@
 # Papers Empire – Developer Guide
 
-This document captures the current architecture of the game, how the files are organised after the split, and the commands needed to run or extend the project.
+This guide tracks the current architecture after the UX/Accessibility refactor, the toolchain, and the modules you’ll touch most often.
 
-## 1. Project Overview
+## 1. Runtime Overview
+- **Client only:** everything runs in the browser. `index.html` loads plain JS modules in the order listed in the markup.
+- **Stateful loop:** `app.js` owns the simulation, rendering, localisation, events, contracts, and saves. A cached `DOM` map avoids repeated query selectors during frames.
+- **Settings & tutorial:** `accessibility.js` exposes a `Settings` API that other modules (tutorial, UI effects, app) consume to apply preferences instantly.
+- **Effects:** `ui-effects.js` centralises particles + audio beeps; `tutorial.js` manages the guided tour overlay and exposes `markMilestone()` for app integration.
 
-Papers Empire is a fully client-side incremental/tycoon experience. All state lives in `app.js`, and rendering is performed with vanilla DOM APIs. There is no build step by design so that you can double-click `index.html` and play.
-
-Key features:
-
-- Buildings and upgrades with multilingual labels (FR/EN) and per-building modifiers.
-- Live stats (DOC, CC, gauges) driven by a simulation loop.
-- Prestige mechanic with culture points and multiplier bonuses.
-- Hidden god mode that accelerates simulated time when the player types `renard` in the window.
-
-## 2. File Structure
-
+## 2. File Structure (simplified)
 ```
 victorzoo/
-├── index.html          # Markup shell referencing styles + scripts
+├── index.html
 ├── assets/
-│   ├── css/
-│   │   └── style.css      # All layout/visual rules
+│   ├── css/style.css
+│   ├── i18n/{fr,en,de,lb}.js
 │   └── js/
-│       ├── app.js         # Gameplay, UI, localisation, god-mode controller
-│       ├── modifier-utils.js  # Pure helpers for modifier math (UMD)
-│       └── godmode-utils.js   # Pure helpers for cheat detection & scaling (UMD)
+│       ├── app.js
+│       ├── accessibility.js      # Settings store + preference wiring
+│       ├── achievements.js
+│       ├── events.js             # Narrative event system
+│       ├── endgame.js            # Premium contracts & timer state
+│       ├── persistence.js
+│       ├── modifier-utils.js
+│       ├── godmode-utils.js
+│       ├── ui-effects.js         # Particles + audio cues
+│       └── tutorial.js           # Guided onboarding flow
 ├── tests/
-│   ├── modifiers.test.js  # Node-based unit tests for modifier-utils
-│   └── godmode.test.js    # Node-based unit tests for godmode-utils
-├── README.md              # High-level project summary + changelog
-└── DOCUMENTATION.md       # (this guide) architecture & workflows
+│   ├── modifiers.test.js
+│   ├── godmode.test.js
+│   ├── events.test.js
+│   ├── i18n.test.js
+│   ├── settings.test.js
+│   └── playwright/
+│       ├── layout.spec.ts
+│       ├── contracts.spec.ts
+│       ├── events.spec.ts
+│       └── tutorial.spec.ts
+├── docs/ (Retype sources)
+│   ├── accessibility.md
+│   ├── DOCUMENTATION.md (this file)
+│   ├── RELEASE_NOTES.md
+│   └── …
+├── playwright.config.ts
+├── package.json
+└── retype.yml
 ```
 
-The helper modules live under `assets/js` so they can be imported by both the browser (via `<script>`) and Node tests (CommonJS). The main `app.js` assumes both helpers have already been loaded and destructures the exported methods.
+## 3. Key Modules
+- **app.js:** entry point. Sets up the DOM cache, localisation, render loop, god mode, contracts, modifiers, log, and event banner. Imports helpers via global variables.
+- **accessibility.js:** exposes `Settings` with `getPrefs`, `getPreference`, `setPreference`, and `refresh`. Toggling a setting updates `document.documentElement` immediately and persists to `pe-accessibility`.
+- **ui-effects.js:** small particle factory + Web Audio tones. Respects `documentElement.dataset` flags so you can disable sounds or particles without touching the module.
+- **tutorial.js:** keeps tutorial steps in memory, controls the overlay, and listens for `markMilestone()` calls. It is intentionally decoupled so we can script custom flows in the future.
+- **events.js:** random incidents and minigames with tone metadata push banners and modals through `app.js`.
+- **endgame.js:** exposes `EndgameModule` which keeps the premium contract catalog, injects their translations, tracks the active timer, and hands rewards/rerolls back to `app.js`.
+- **persistence.js:** thin wrapper around localStorage that serialises the `gameState` slices.
 
-## 3. Running the Game
-
-1. Open `index.html` in any modern browser (Chrome, Firefox, Edge, Safari).
-2. Switch languages via the FR/EN picker in the top-left corner.
-3. Click `Imprimer un document` to start generating DOC, then purchase buildings/upgrades as funds allow.
-
-There is no build or server dependency. If you prefer to serve through a local static server for caching reasons, any tool (e.g. `npx serve .`) will work.
-
-## 4. Testing
-
-Two lightweight Node tests cover the pure helper modules:
-
-```bash
-cd victorzoo
-node tests/modifiers.test.js
-node tests/godmode.test.js
+## 4. Settings & Tutorial Flow
+```mermaid
+flowchart LR
+  SettingsUI[Settings modal<br/>checkboxes]
+  SettingsAPI[Settings API]
+  Tutorial[Tutorial engine]
+  App[app.js]
+  Effects[ui-effects.js]
+  SettingsUI -->|setPreference| SettingsAPI
+  SettingsAPI -->|classes & datasets| App
+  SettingsAPI -->|persist JSON| localStorage
+  App -->|markMilestone| Tutorial
+  Tutorial -->|highlight selectors| DOM
+  App -->|trigger| Effects
 ```
 
-These can run without a DOM since both helper files expose CommonJS exports. When you add new pure helpers, place their tests alongside these files.
+## 5. Testing & Commands
+- **Unit tests:** `npm run test:unit` sequentially executes all Node tests (modifiers, godmode, events, i18n consistency, settings).
+- **E2E tests:** `npm run test:e2e` launches Playwright. Specs cover layout, contracts, events, and the new tutorial/settings UX.
+- **Docs:** `npm run docs:build` generates the Retype site into `docs-site/` so CI/GitHub Pages can publish it.
 
-## 5. God Mode Cheatsheet
+## 6. Documentation & Releases
+- Retype sources live in `docs/`. Add a new Markdown file per major feature (events, accessibility, endgame, balance…).
+- `docs/RELEASE_NOTES.md` is the canonical changelog. Update it whenever you land a sizeable batch of changes; `AGENTS.md` points to it for release tracking.
 
-- Focus the window and type `renard` (without quotes). Inputs inside text fields are ignored so you can keep chatting/renaming without triggering the cheat.
-- Once unlocked, the god-mode card becomes visible in the right column.
-- Use the x1/x10/x100/x1000 buttons to set the simulation time scale. This multiplies the `dt` delta that drives production, prestige, and gauge recovery.
+## 7. Contracts & Journal Tab
+- The card in the right column exposes two tabs. `switchDetailTab()` simply toggles `hidden`/`active` classes and updates the `aria-selected` state so the player can jump between premium contracts and the activity journal without re-rendering the full UI.
+- `endgame.js` registers `EndgameModule` which seeds contract translations, surfaces up to three offers through `availableContracts(gameState)`, enforces requirements (quality, image, doc volume) in `startContract()`, and keeps the `activeContract` timer that `renderActiveContract()` reads.
+- `handleContractsReroll()` wires the “Refresh offers” button, throttled by `CONTRACT_REROLL_COOLDOWN` (30 s). `updateRerollButton()` swaps the label to `contracts.rerollCountdown` while the button is disabled so the UX explains why nothing happens on click.
+- `tickContracts(dt)` now runs inside the `update()` loop, so active deals count down even when the player idles. Once a timer reaches zero, rewards (+DOC/+CC/placeholder “cards”) are applied client-side, a banner/log entry is pushed, and `renderContractsPanel()` picks a replacement offer.
+- The Journal tab simply renders `gameState.log` and stays in sync thanks to `renderAll()`; tutorial steps mark the tab once players open it so future onboarding nudges can reference the log.
 
-## 6. Coding Guidelines
-
-- **DOM caching:** `app.js` caches all frequently used nodes in the `DOM` object to avoid repeated queries per frame.
-- **Translations:** add new keys to the `I18N` object (both FR and EN sections). Use `data-i18n` where possible so `applyStaticTranslations()` keeps the UI in sync.
-- **State updates:** whenever a change impacts building or upgrade layouts, flip `uiState.buildingsDirty` or `uiState.upgradesDirty` so `renderAll()` can refresh only what is necessary.
-- **Documentation:** prefer short JSDoc-style block comments (already applied throughout `app.js`) to explain non-trivial functions.
-- **Testing:** keep logic that can be isolated (math helpers, cheat detection, etc.) outside of `app.js` so it can be reused in the browser and in tests.
-
-## 7. Next Steps
-
-- Extend the upgrade list (`gameState.upgrades`) with richer mechanics.
-- Add persistence (localStorage) so progress survives reloads.
-- Experiment with more events/log messaging to keep later stages lively.
-
-Feel free to append new sections when adding significant capabilities so future contributors understand the mental model quickly.
+## 8. Next Steps
+- Expand UI effects with reusable animation presets (purchase streaks, tutorial callouts).
+- Instrument automated accessibility checks (axe, Playwright) in CI.
+- Break `app.js` into dedicated controllers (buildings, upgrades, contracts) to reduce the monolith as features grow.

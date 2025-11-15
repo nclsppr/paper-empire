@@ -7,6 +7,11 @@ Un carnet de bord libre pour noter idées, questions et réflexions autour de Pa
 - Persistences multi-slots ? (genre `profiles/slot1` etc) – demandé ou non ?
 - Interface mobile : inspecter les impressions Lighthouse / axe encore, s’assurer qu’on a bien 100 en accessibility après les derniers ajouts.
 
+### Entrée 0.7
+- Le panneau Paramètres + tutoriel guidé donnent enfin une porte d’entrée claire. Prochaine étape : découper `app.js` (contrats/events) pour éviter de l’épaissir encore.
+- À surveiller : coût des particules/audio sur mobiles bas de gamme. Peut-être ajouter un “performance preset” automatique.
+- Idée fun : utiliser le tutoriel pour déclencher des micro-révélations (pointer le journal quand un event est en cours, pointer les contrats quand on débloque une carte). Il faudrait une API d’événements côté `Tutorial` pour écouter ces signaux.
+
 ## Idées futures
 - Système de contrats clients avec pipeline (ex: `tableur → impression → finishing`). UI en Kanban ?
 - Marketplace de modules (cartes) avec rareté ; pipeline de loot box optionnel (cosmétique).

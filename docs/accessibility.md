@@ -1,32 +1,47 @@
 # Accessibility
 
-Papers Empire strives to meet WCAG 2.1 AA / RGAA best practices. This page tracks the key features and TODOs.
+Papers Empire targets WCAG 2.1 AA and RGAA recommendations. The client now exposes a dedicated settings drawer, richer feedback, and automated tests to keep the experience inclusive.
 
-## Navigation & Structure
-- Skip link (`.skip-link`) lets keyboard users jump to `#mainContent`.
-- Landmarks: `<header role="banner">`, `<main role="main">`, sections with `role="region"` + `aria-label`.
-- Language selector updates `<html lang>` when switching languages.
-- Log and achievements panels expose `aria-live="polite"` so screen readers hear updates.
+## Settings Drawer
+The ⚙️ button opens a modal built with four sections. All controls are native checkboxes/buttons, receive focus styles, and persist via `pe-accessibility` in `localStorage`.
 
-## Controls & States
-- All buttons/selects inherit `font: inherit` and have visible `:focus-visible` outlines.
-- God mode, save/export, achievements, and prestige buttons are keyboard reachable.
-- Tooltips and icon buttons include textual equivalents.
-- Motion can be reduced by enabling `prefers-reduced-motion` or toggling the “Reduce motion” checkbox.
+- **Accessibility tab:** toggles for high contrast, large text (bumps the `:root` font-size), and reduced motion. Each option simply flips a `pref-*` class and is applied before `app.js` renders to avoid flashes.
+- **Audio tab:** enables or disables UI bleeps produced by `ui-effects.js`. The toggle maps to `documentElement.dataset.soundsEnabled` so other modules can respect it without reading storage.
+- **Interface tab:** controls the particle layer and the guided tutorial. Players can re-run the tutorial at any time through the “Restart tutorial” button.
+- **Save tab:** houses export/import/reset buttons so keyboard users can access them without scrolling through the right column.
 
-## Visual Accessibility
-- Global contrast uses dark backgrounds with light text (aiming > 4.5:1). A “High contrast” toggle in the accessibility panel swaps to higher contrast colors via CSS classes.
-- Base font is 14px, but the “Large text” toggle bumps the root font size for better readability.
-- Ripple/animation effects turn off when reduce motion is enabled.
-- Social card + meta tags include descriptive text for sharing.
+## Visual & Audio Feedback
+`ui-effects.js` centralises particles and minimal Web Audio beeps:
 
-## Persistence of Preferences
-- User choices (high contrast, large text, reduce motion) are stored in `localStorage` (`pe-accessibility`).
-- Preferences activate on page load before the main script runs to avoid flashes.
+- Clicks trigger a subtle pulse while purchases spawn particles around the pressed button.
+- Buying the most expensive building kicks off a confetti celebration + celebration tone.
+- All effects bail out automatically when either `pref-reduce-motion` is active or the “Particles” toggle is disabled.
+
+## Guided Tutorial
+`assets/js/tutorial.js` orchestrates a first-run overlay that highlights important modules (print button → buildings → journal → settings). It hooks into `Settings` to know whether the user already finished the flow, and exposes `markMilestone()` so `app.js` can advance steps when the player actually completes each action.
+
+## Testing & Tooling
+- `tests/settings.test.js` validates that the Settings API toggles classes/datasets correctly and that returned preference objects are copies.
+- `tests/playwright/tutorial.spec.ts` drives a full tutorial playthrough plus a regression that ensures high-contrast toggles persist across reloads.
+- Layout spec `layout.spec.ts` still guards the iPhone 15 Pro Max centring requirement.
+
+## Preference Flow
+```mermaid
+sequenceDiagram
+  participant Player
+  participant UI as Settings Modal
+  participant Store as Settings API
+  participant DOM as Document
+  participant Storage as localStorage
+  Player->>UI: Toggle “High contrast”
+  UI->>Store: setPreference("highContrast", true)
+  Store->>DOM: Add .pref-high-contrast
+  Store->>DOM: dataset.soundsEnabled = "1"
+  Store->>Storage: Save "pe-accessibility"
+```
 
 ## TODO / Ideas
-- Add voice guidance or audio cues for key milestones.
-- Provide keyboard shortcuts list and allow remapping.
-- Expand achievements/log filtering to include screen-reader friendly summaries.
-- Offer alternative color palettes (e.g., for protanopia/deuteranopia).
-- Automated accessibility tests (axe-core, Playwright + axe) per PR.
+- Axe-core + Playwright automation to catch regressions before shipping.
+- Alternate color palettes (deuteranopia/protanopia) exposed as additional toggles.
+- Narrated tooltips for the tutorial, possibly with Web Speech API for hands-free accessibility.
+- Keyboard shortcut help sheet living near the settings drawer.

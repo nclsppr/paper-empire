@@ -49,18 +49,30 @@
   <div class="header-inner">
     <div class="header-top">
       <div class="header-title" data-game-title></div>
-      <select id="langSelect" class="lang-select">
-        <option value="fr">FR</option>
-        <option value="en">EN</option>
-        <option value="de">DE</option>
-        <option value="lb">LB</option>
-      </select>
+      <div class="header-actions">
+        <button class="icon-button" type="button" data-open-settings id="settingsGearButton">
+          <span aria-hidden="true">⚙️</span>
+          <span class="sr-only" data-i18n="actions.openSettings"></span>
+        </button>
+        <select id="langSelect" class="lang-select" aria-label="Langue">
+          <option value="fr">FR</option>
+          <option value="en">EN</option>
+          <option value="de">DE</option>
+          <option value="lb">LB</option>
+        </select>
+      </div>
     </div>
     <div class="header-tagline" data-i18n="app.tagline"></div>
+  </div>
 </header>
 <div class="event-banner hidden" id="eventBanner" aria-live="polite">
-  <span id="eventBannerText"></span>
-  <button id="closeEventBanner" aria-label="Fermer">×</button>
+  <div class="event-banner-icon" id="eventBannerEmoji" aria-hidden="true">🔔</div>
+  <div class="event-banner-body">
+    <div id="eventBannerText"></div>
+  </div>
+  <button class="event-banner-close" id="closeEventBanner" aria-label="Fermer">
+    <span aria-hidden="true">×</span>
+  </button>
 </div>
 <main id="mainContent" class="app" role="main">
   <!-- Colonne gauche: clic + stats -->
@@ -165,28 +177,7 @@
 
     <div class="card progress-card" role="region" aria-label="Progression, sauvegarde et accessibilité">
       <h2 data-i18n="sections.progressTitle"></h2>
-      <div class="progress-actions">
-        <button class="btn-slim" id="exportSaveBtn" data-i18n="actions.exportSave"></button>
-        <button class="btn-slim" id="importSaveBtn" data-i18n="actions.importSave"></button>
-        <button class="btn-slim danger" id="resetSaveBtn" data-i18n="actions.resetSave"></button>
-      </div>
-      <details class="accessibility-panel">
-        <summary data-i18n="sections.accessibilityTitle"></summary>
-        <div class="accessibility-options">
-          <label class="option-row">
-            <input type="checkbox" id="toggleHighContrast">
-            <span data-i18n="accessibility.highContrast"></span>
-          </label>
-          <label class="option-row">
-            <input type="checkbox" id="toggleLargeText">
-            <span data-i18n="accessibility.largeText"></span>
-          </label>
-          <label class="option-row">
-            <input type="checkbox" id="toggleReduceMotion">
-            <span data-i18n="accessibility.reduceMotion"></span>
-          </label>
-        </div>
-      </details>
+      <p class="small" data-i18n="sections.settingsHint"></p>
       <div class="achievements-list" id="achievementsList" aria-live="polite"></div>
     </div>
 
@@ -222,6 +213,77 @@
       </div>
     </div>
     <div class="event-result" id="eventResult"></div>
+</div>
+</div>
+
+<div class="settings-modal hidden" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
+  <div class="settings-dialog" tabindex="-1">
+    <div class="settings-dialog-header">
+      <h3 id="settingsTitle" data-i18n="settings.title"></h3>
+      <button class="icon-button" id="closeSettingsBtn" type="button">
+        <span aria-hidden="true">×</span>
+        <span class="sr-only" data-i18n="actions.close"></span>
+      </button>
+    </div>
+    <div class="settings-tabs" role="tablist">
+      <button class="settings-tab active" type="button" data-settings-tab="accessibility" role="tab" data-i18n="settings.tab.accessibility"></button>
+      <button class="settings-tab" type="button" data-settings-tab="audio" role="tab" data-i18n="settings.tab.audio"></button>
+      <button class="settings-tab" type="button" data-settings-tab="interface" role="tab" data-i18n="settings.tab.interface"></button>
+      <button class="settings-tab" type="button" data-settings-tab="save" role="tab" data-i18n="settings.tab.save"></button>
+    </div>
+    <div class="settings-section" data-settings-section="accessibility">
+      <p class="small" data-i18n="settings.accessibilityHint"></p>
+      <label class="option-row">
+        <input type="checkbox" id="toggleHighContrast">
+        <span data-i18n="accessibility.highContrast"></span>
+      </label>
+      <label class="option-row">
+        <input type="checkbox" id="toggleLargeText">
+        <span data-i18n="accessibility.largeText"></span>
+      </label>
+      <label class="option-row">
+        <input type="checkbox" id="toggleReduceMotion">
+        <span data-i18n="accessibility.reduceMotion"></span>
+      </label>
+    </div>
+    <div class="settings-section hidden" data-settings-section="audio">
+      <p class="small" data-i18n="settings.audioHint"></p>
+      <label class="option-row">
+        <input type="checkbox" id="toggleSounds">
+        <span data-i18n="settings.sounds"></span>
+      </label>
+    </div>
+    <div class="settings-section hidden" data-settings-section="interface">
+      <p class="small" data-i18n="settings.interfaceHint"></p>
+      <label class="option-row">
+        <input type="checkbox" id="toggleParticles">
+        <span data-i18n="settings.particles"></span>
+      </label>
+      <label class="option-row">
+        <input type="checkbox" id="toggleTutorial">
+        <span data-i18n="settings.tutorial"></span>
+      </label>
+      <button class="btn-slim" type="button" id="restartTutorialBtn" data-i18n="settings.restartTutorial"></button>
+    </div>
+    <div class="settings-section hidden" data-settings-section="save">
+      <p class="small" data-i18n="settings.saveHint"></p>
+      <button class="btn-slim" id="exportSaveBtn" data-i18n="actions.exportSave"></button>
+      <button class="btn-slim" id="importSaveBtn" data-i18n="actions.importSave"></button>
+      <button class="btn-slim danger" id="resetSaveBtn" data-i18n="actions.resetSave"></button>
+    </div>
+  </div>
+</div>
+
+<div class="tutorial-overlay hidden" id="tutorialOverlay" role="dialog" aria-modal="true" aria-live="polite">
+  <div class="tutorial-card">
+    <div class="tutorial-step-label" id="tutorialStep"></div>
+    <h3 id="tutorialTitle"></h3>
+    <p id="tutorialBody"></p>
+    <div class="tutorial-actions">
+      <button class="btn-slim" type="button" id="tutorialPrev" data-i18n="actions.previous"></button>
+      <button class="btn-slim" type="button" id="tutorialNext" data-i18n="actions.next"></button>
+      <button class="btn-slim danger" type="button" id="tutorialSkip" data-i18n="actions.skip"></button>
+    </div>
   </div>
 </div>
 
@@ -236,6 +298,8 @@
   <script src="assets/js/modifier-utils.js"></script>
   <script src="assets/js/godmode-utils.js"></script>
   <script src="assets/js/accessibility.js"></script>
+  <script src="assets/js/ui-effects.js"></script>
+  <script src="assets/js/tutorial.js"></script>
   <script src="assets/js/app.js" defer></script>
 </body>
 </html>
