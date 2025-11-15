@@ -35,5 +35,6 @@ When you make notable changes (new features, mechanics, UI improvements), append
 ## Architecture & Notes
 
 - Lire [`architecture.md`](architecture.md) pour les flux techniques, la description des modules et les diagrammes Mermaid (autosave, achievements, etc.).
+- Consulte [`events.md`](events.md) pour le catalogue d’événements et le mini-jeu de calibrage.
 - Pour la vision gameplay, continuer avec [`game-design.md`](game-design.md).
 - Le carnet de réflexions ouvert se trouve dans [`codex-is-thinking.md`](codex-is-thinking.md).

@@ -615,6 +615,27 @@
       gap: 10px;
     }
 
+    .news-card {
+      border-left: 3px solid #38bdf8;
+    }
+
+    .news-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 180px;
+      overflow-y: auto;
+      padding-right: 4px;
+      font-size: 12px;
+      color: #cbd5f5;
+    }
+
+    .news-item time {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-right: 6px;
+    }
+
     .progress-actions {
       display: flex;
       gap: 6px;
@@ -676,6 +697,95 @@
     .achievement-status {
       font-size: 11px;
       color: #94a3b8;
+    }
+
+    .event-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .event-modal.hidden {
+      display: none;
+    }
+
+    .event-dialog {
+      background: #0f172a;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      border-radius: 12px;
+      width: min(90vw, 420px);
+      padding: 16px;
+      position: relative;
+      box-shadow: 0 20px 45px rgba(2, 6, 23, 0.7);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .event-choices {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .event-choice-btn {
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: left;
+      background: rgba(15, 23, 42, 0.8);
+      color: #e2e8f0;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .event-choice-btn:hover,
+    .event-choice-btn:focus-visible {
+      background: rgba(59, 130, 246, 0.2);
+      outline: none;
+    }
+
+    .event-result {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #fef08a;
+      min-height: 24px;
+    }
+
+    .event-minigame {
+      margin-top: 12px;
+      border: 1px dashed rgba(248, 250, 252, 0.2);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .minigame-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .minigame-buttons button {
+      flex: 1;
+      border: 1px solid rgba(248, 250, 252, 0.4);
+      border-radius: 8px;
+      padding: 8px 0;
+      background: rgba(15, 23, 42, 0.9);
+      color: #f8fafc;
+      cursor: pointer;
     }
 
     .accessibility-panel {

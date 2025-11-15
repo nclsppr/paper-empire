@@ -151,6 +151,11 @@
       <div class="log-panel" id="logPanel" aria-live="polite"></div>
     </div>
 
+    <div class="card news-card" role="region" aria-label="Actualités">
+      <h2 data-i18n="sections.newsTitle"></h2>
+      <div class="news-list" id="newsTicker" aria-live="polite"></div>
+    </div>
+
     <div class="card progress-card" role="region" aria-label="Progression, sauvegarde et accessibilité">
       <h2 data-i18n="sections.progressTitle"></h2>
       <div class="progress-actions">
@@ -190,7 +195,28 @@
       </div>
     </div>
   </div>
+  </div>
 </main>
+
+<div class="event-modal hidden" id="eventModal" role="dialog" aria-modal="true" aria-labelledby="eventTitle">
+  <div class="event-dialog">
+    <button class="modal-close" id="closeEventModal" aria-label="Fermer">×</button>
+    <div class="event-header">
+      <h3 id="eventTitle"></h3>
+      <p id="eventDescription"></p>
+    </div>
+    <div class="event-choices" id="eventChoices"></div>
+    <div class="event-minigame hidden" id="minigameContainer">
+      <p id="minigamePrompt"></p>
+      <div class="minigame-buttons">
+        <button data-minigame-response="1">1</button>
+        <button data-minigame-response="2">2</button>
+        <button data-minigame-response="3">3</button>
+      </div>
+    </div>
+    <div class="event-result" id="eventResult"></div>
+  </div>
+</div>
 
   <script src="assets/i18n/fr.js"></script>
   <script src="assets/i18n/en.js"></script>
@@ -198,6 +224,7 @@
   <script src="assets/i18n/lb.js"></script>
   <script src="assets/js/persistence.js"></script>
   <script src="assets/js/achievements.js"></script>
+  <script src="assets/js/events.js"></script>
   <script src="assets/js/modifier-utils.js"></script>
   <script src="assets/js/godmode-utils.js"></script>
   <script src="assets/js/accessibility.js"></script>

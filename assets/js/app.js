@@ -10,6 +10,7 @@
   const GAME_TITLE = window.GAME_TITLE || "Papers Empire";
   const { computeBuildingEffects, getBuildingImpact } = ModifierUtils;
   const { sanitizeTimeScale, updateCheatProgress } = GodModeUtils;
+  const Events = window.Events;
 
   // -------------------------------
   // Internationalisation + état UI
@@ -60,6 +61,11 @@
 
   const achievementsState = {
     unlocked: {}
+  };
+
+  const eventState = {
+    news: [],
+    modalCanClose: false
   };
 
   let saveTimer = null;
@@ -268,6 +274,15 @@
     DOM.exportSaveBtn = document.getElementById("exportSaveBtn");
     DOM.importSaveBtn = document.getElementById("importSaveBtn");
     DOM.resetSaveBtn = document.getElementById("resetSaveBtn");
+    DOM.newsTicker = document.getElementById("newsTicker");
+    DOM.eventModal = document.getElementById("eventModal");
+    DOM.eventTitle = document.getElementById("eventTitle");
+    DOM.eventDescription = document.getElementById("eventDescription");
+    DOM.eventChoices = document.getElementById("eventChoices");
+    DOM.eventResult = document.getElementById("eventResult");
+    DOM.minigameContainer = document.getElementById("minigameContainer");
+    DOM.minigamePrompt = document.getElementById("minigamePrompt");
+    DOM.closeEventModal = document.getElementById("closeEventModal");
   }
 
   /** Hooks click events to the main CTAs. */
@@ -295,6 +310,21 @@
     if (DOM.resetSaveBtn) {
       DOM.resetSaveBtn.addEventListener("click", handleResetSave);
     }
+
+    if (DOM.eventChoices) {
+      DOM.eventChoices.addEventListener("click", handleEventChoiceClick);
+    }
+    if (DOM.minigameContainer) {
+      DOM.minigameContainer.addEventListener("click", handleMinigameResponse);
+    }
+    if (DOM.closeEventModal) {
+      DOM.closeEventModal.addEventListener("click", () => closeEventModal());
+    }
+    document.addEventListener("keydown", evt => {
+      if (evt.key === "Escape") {
+        closeEventModal(true);
+      }
+    });
 
     document.addEventListener("click", event => {
       if (!event.target.closest(".building-name-button") && !event.target.closest(".building-tooltip")) {
@@ -335,6 +365,7 @@
     applyGameTitle();
     renderGodModePanel(true);
     renderAchievementsPanel();
+    renderNews();
   }
 
   function applyGameTitle() {
@@ -731,6 +762,7 @@
 
     refreshUpgradeUnlocks();
     maybeSpawnSmallEvents(dt);
+    checkDynamicEvents(dt);
     checkAchievements();
     queueSave();
   }
@@ -904,6 +936,128 @@
       div.textContent = "[" + timeLabel + "] " + text;
       DOM.logPanel.appendChild(div);
     }
+  }
+
+  function renderNews() {
+    const container = DOM.newsTicker;
+    if (!container) return;
+    container.innerHTML = "";
+    if (!eventState.news.length) {
+      const empty = document.createElement("div");
+      empty.className = "news-item";
+      empty.textContent = t("events.news.empty");
+      container.appendChild(empty);
+      return;
+    }
+    for (const entry of eventState.news) {
+      const div = document.createElement("div");
+      div.className = "news-item";
+      const timeEl = document.createElement("time");
+      timeEl.textContent = entry.time.toLocaleTimeString(currentLang === "en" ? "en-US" : "fr-FR", { hour: "2-digit", minute: "2-digit" });
+      div.appendChild(timeEl);
+      const span = document.createElement("span");
+      span.textContent = t(entry.key, entry.params || {});
+      div.appendChild(span);
+      container.appendChild(div);
+    }
+  }
+
+  function addNewsEntry(key, params = {}) {
+    if (!key) return;
+    eventState.news.unshift({ key, time: new Date(), params });
+    if (eventState.news.length > 5) {
+      eventState.news.pop();
+    }
+    renderNews();
+  }
+
+  function checkDynamicEvents(dt) {
+    if (!window.Events) return;
+    const newEvent = Events.tick(gameState, dt);
+    if (newEvent) {
+      logMessage("log.event", { name: t(newEvent.titleKey) });
+      handleEventSpawn(newEvent);
+    }
+  }
+
+  function handleEventSpawn(eventDef) {
+    eventState.active = eventDef;
+    eventState.modalCanClose = false;
+    addNewsEntry(eventDef.titleKey);
+    showEventModal(eventDef);
+  }
+
+  function showEventModal(eventDef) {
+    if (!DOM.eventModal) return;
+    DOM.eventModal.classList.remove("hidden");
+    DOM.eventModal.setAttribute("aria-hidden", "false");
+    DOM.eventTitle.textContent = t(eventDef.titleKey);
+    DOM.eventDescription.textContent = t(eventDef.descriptionKey);
+    DOM.eventResult.textContent = "";
+    DOM.eventChoices.innerHTML = "";
+    DOM.closeEventModal.disabled = true;
+    DOM.closeEventModal.setAttribute("aria-disabled", "true");
+    if (eventDef.type === "choice") {
+      DOM.eventChoices.classList.remove("hidden");
+      DOM.minigameContainer.classList.add("hidden");
+      for (const choice of eventDef.choices) {
+        const btn = document.createElement("button");
+        btn.className = "event-choice-btn";
+        btn.dataset.choice = choice.id;
+        btn.textContent = t(choice.labelKey);
+        DOM.eventChoices.appendChild(btn);
+      }
+      const first = DOM.eventChoices.querySelector("button");
+      if (first) {
+        first.focus();
+      }
+    } else {
+      DOM.eventChoices.classList.add("hidden");
+      DOM.minigameContainer.classList.remove("hidden");
+      const info = Events.startMinigame();
+      const code = info ? info.code : 1;
+      DOM.minigamePrompt.textContent = t("events.calibration.prompt", { code });
+      DOM.minigameContainer.querySelector("button").focus();
+    }
+  }
+
+  function closeEventModal(force = false) {
+    if (!DOM.eventModal || DOM.eventModal.classList.contains("hidden")) return;
+    if (!eventState.modalCanClose && !force) return;
+    DOM.eventModal.classList.add("hidden");
+    DOM.eventModal.setAttribute("aria-hidden", "true");
+  }
+
+  function handleEventChoiceClick(event) {
+    const btn = event.target.closest("[data-choice]");
+    if (!btn) return;
+    const choiceId = btn.dataset.choice;
+    const result = Events.resolveChoice(choiceId, gameState);
+    if (!result) return;
+    DOM.eventResult.textContent = t(result.resultKey);
+    addNewsEntry(result.resultKey);
+    logMessage("log.eventResult", { result: t(result.resultKey) });
+    queueSave(true);
+    eventState.active = null;
+    eventState.modalCanClose = true;
+    DOM.closeEventModal.disabled = false;
+    DOM.closeEventModal.removeAttribute("aria-disabled");
+  }
+
+  function handleMinigameResponse(event) {
+    const btn = event.target.closest("[data-minigame-response]");
+    if (!btn) return;
+    const answer = btn.getAttribute("data-minigame-response");
+    const result = Events.resolveMinigame(answer, gameState);
+    if (!result) return;
+    DOM.eventResult.textContent = t(result.resultKey);
+    addNewsEntry(result.resultKey);
+    logMessage("log.eventResult", { result: t(result.resultKey) });
+    queueSave(true);
+    eventState.active = null;
+    eventState.modalCanClose = true;
+    DOM.closeEventModal.disabled = false;
+    DOM.closeEventModal.removeAttribute("aria-disabled");
   }
 
   function renderAchievementsPanel() {
@@ -1162,6 +1316,7 @@
     renderStats();
     renderPrestige();
     renderLog();
+    renderNews();
     renderAchievementsPanel();
     renderGodModePanel();
     syncBuildingUnlocks();
@@ -1257,4 +1412,13 @@
   function clamp01(x) {
     return Math.max(0, Math.min(1, x));
   }
+
+  window.__PE_DEBUG = window.__PE_DEBUG || {};
+  window.__PE_DEBUG.spawnEvent = id => {
+    if (!window.Events) return;
+    const ev = window.Events.debugForceEvent(id);
+    if (ev) {
+      handleEventSpawn(ev);
+    }
+  };
 })();

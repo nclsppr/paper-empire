@@ -6,6 +6,7 @@ branding:
 navigation:
   - Overview: README.md
   - Architecture: architecture.md
+  - Events: events.md
   - Accessibility: accessibility.md
   - Game Design: game-design.md
   - Release Notes: RELEASE_NOTES.md
