@@ -64,8 +64,9 @@
   };
 
   const eventState = {
-    news: [],
-    modalCanClose: false
+    modalCanClose: false,
+    bannerTone: "mixed",
+    bannerKey: null
   };
 
   const contractsState = {
@@ -280,7 +281,9 @@
     DOM.exportSaveBtn = document.getElementById("exportSaveBtn");
     DOM.importSaveBtn = document.getElementById("importSaveBtn");
     DOM.resetSaveBtn = document.getElementById("resetSaveBtn");
-    DOM.newsTicker = document.getElementById("newsTicker");
+    DOM.eventBanner = document.getElementById("eventBanner");
+    DOM.eventBannerText = document.getElementById("eventBannerText");
+    DOM.closeEventBanner = document.getElementById("closeEventBanner");
     DOM.eventModal = document.getElementById("eventModal");
     DOM.eventTitle = document.getElementById("eventTitle");
     DOM.eventDescription = document.getElementById("eventDescription");
@@ -331,6 +334,9 @@
         closeEventModal(true);
       }
     });
+    if (DOM.closeEventBanner) {
+      DOM.closeEventBanner.addEventListener("click", hideEventBanner);
+    }
 
     document.addEventListener("click", event => {
       if (!event.target.closest(".building-name-button") && !event.target.closest(".building-tooltip")) {
@@ -371,7 +377,6 @@
     applyGameTitle();
     renderGodModePanel(true);
     renderAchievementsPanel();
-    renderNews();
   }
 
   function applyGameTitle() {
@@ -951,37 +956,21 @@
     }
   }
 
-  function renderNews() {
-    const container = DOM.newsTicker;
-    if (!container) return;
-    container.innerHTML = "";
-    if (!eventState.news.length) {
-      const empty = document.createElement("div");
-      empty.className = "news-item";
-      empty.textContent = t("events.news.empty");
-      container.appendChild(empty);
-      return;
-    }
-    for (const entry of eventState.news) {
-      const div = document.createElement("div");
-      div.className = "news-item";
-      const timeEl = document.createElement("time");
-      timeEl.textContent = entry.time.toLocaleTimeString(currentLang === "en" ? "en-US" : "fr-FR", { hour: "2-digit", minute: "2-digit" });
-      div.appendChild(timeEl);
-      const span = document.createElement("span");
-      span.textContent = t(entry.key, entry.params || {});
-      div.appendChild(span);
-      container.appendChild(div);
-    }
+  function showEventBanner(key, tone = "mixed", params = {}) {
+    if (!DOM.eventBanner) return;
+    DOM.eventBanner.classList.remove("hidden", "banner-positive", "banner-mixed", "banner-negative");
+    const cls = tone === "positive" ? "banner-positive" : tone === "negative" ? "banner-negative" : "banner-mixed";
+    DOM.eventBanner.classList.add(cls);
+    eventState.bannerTone = tone;
+    eventState.bannerKey = key;
+    DOM.eventBannerText.textContent = t(key, params);
   }
 
-  function addNewsEntry(key, params = {}) {
-    if (!key) return;
-    eventState.news.unshift({ key, time: new Date(), params });
-    if (eventState.news.length > 5) {
-      eventState.news.pop();
-    }
-    renderNews();
+  function hideEventBanner() {
+    if (!DOM.eventBanner) return;
+    DOM.eventBanner.classList.add("hidden");
+    DOM.eventBannerText.textContent = "";
+    eventState.bannerKey = null;
   }
 
   function checkDynamicEvents(dt) {
@@ -1048,13 +1037,14 @@
     const result = Events.resolveChoice(choiceId, gameState);
     if (!result) return;
     DOM.eventResult.textContent = t(result.resultKey);
-    addNewsEntry(result.resultKey);
     logMessage("log.eventResult", { result: t(result.resultKey) });
     queueSave(true);
     eventState.active = null;
     eventState.modalCanClose = true;
     DOM.closeEventModal.disabled = false;
     DOM.closeEventModal.removeAttribute("aria-disabled");
+    closeEventModal(true);
+    showEventBanner(result.resultKey, result.tone || "mixed");
   }
 
   function renderContractsPanel() {
@@ -1104,7 +1094,7 @@
       alert(t("contracts.alreadyRunning"));
       return;
     }
-    addNewsEntry("contracts.news.started", { name: t(`contracts.${contractId}.title`, {}, contractId) });
+    logMessage("log.contractStart", { name: t(window.EndgameModule.activeContract.current.nameKey) });
     renderActiveContract();
   }
 
@@ -1132,8 +1122,8 @@
     if (!window.EndgameModule) return;
     const result = window.EndgameModule.tickContract(dt, gameState);
     if (result) {
-      addNewsEntry("contracts.news.completed", { name: t(result.nameKey) });
       logMessage("log.contractComplete", { name: t(result.nameKey) });
+      showEventBanner("contracts.banner.completed", "positive", { name: t(result.nameKey) });
       renderActiveContract();
       queueSave(true);
     } else {
@@ -1148,13 +1138,14 @@
     const result = Events.resolveMinigame(answer, gameState);
     if (!result) return;
     DOM.eventResult.textContent = t(result.resultKey);
-    addNewsEntry(result.resultKey);
     logMessage("log.eventResult", { result: t(result.resultKey) });
     queueSave(true);
     eventState.active = null;
     eventState.modalCanClose = true;
     DOM.closeEventModal.disabled = false;
     DOM.closeEventModal.removeAttribute("aria-disabled");
+    closeEventModal(true);
+    showEventBanner(result.resultKey, result.tone || "mixed");
   }
 
   function renderAchievementsPanel() {
@@ -1413,7 +1404,6 @@
     renderStats();
     renderPrestige();
     renderLog();
-    renderNews();
     renderContractsPanel();
     renderAchievementsPanel();
     renderGodModePanel();

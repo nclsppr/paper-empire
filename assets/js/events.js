@@ -12,6 +12,7 @@
           id: "fix",
           labelKey: "events.machineBreakdown.choice.fix",
           resultKey: "events.machineBreakdown.result.fix",
+          tone: "positive",
           effect(gameState) {
             const cost = Math.min(50, gameState.resources.docBank * 0.2);
             gameState.resources.docBank = Math.max(0, gameState.resources.docBank - cost);
@@ -22,6 +23,7 @@
           id: "ignore",
           labelKey: "events.machineBreakdown.choice.ignore",
           resultKey: "events.machineBreakdown.result.ignore",
+          tone: "negative",
           effect(gameState) {
             gameState.stats.quality = Math.max(0, gameState.stats.quality - 0.08);
           }
@@ -38,6 +40,7 @@
           id: "full",
           labelKey: "events.auditQuality.choice.full",
           resultKey: "events.auditQuality.result.full",
+          tone: "positive",
           effect(gameState) {
             gameState.resources.ccTotal += 50;
             gameState.stats.quality = Math.min(1, gameState.stats.quality + 0.1);
@@ -47,6 +50,7 @@
           id: "superficial",
           labelKey: "events.auditQuality.choice.superficial",
           resultKey: "events.auditQuality.result.superficial",
+          tone: "negative",
           effect(gameState) {
             gameState.stats.quality = Math.max(0, gameState.stats.quality - 0.05);
             gameState.resources.ccTotal = Math.max(0, gameState.resources.ccTotal - 30);
@@ -64,6 +68,7 @@
           id: "accept",
           labelKey: "events.newContract.choice.accept",
           resultKey: "events.newContract.result.accept",
+          tone: "mixed",
           effect(gameState) {
             gameState.resources.docBank += 120;
             gameState.stats.footprint = Math.min(1, gameState.stats.footprint + 0.05);
@@ -73,6 +78,7 @@
           id: "decline",
           labelKey: "events.newContract.choice.decline",
           resultKey: "events.newContract.result.decline",
+          tone: "negative",
           effect(gameState) {
             gameState.resources.ccTotal = Math.max(0, gameState.resources.ccTotal - 40);
           }
@@ -89,6 +95,7 @@
           id: "disconnect",
           labelKey: "events.cyberAttack.choice.disconnect",
           resultKey: "events.cyberAttack.result.disconnect",
+          tone: "negative",
           effect(gameState) {
             const penalty = Math.min(gameState.resources.docBank, 80);
             gameState.resources.docBank -= penalty;
@@ -98,6 +105,7 @@
           id: "pay",
           labelKey: "events.cyberAttack.choice.pay",
           resultKey: "events.cyberAttack.result.pay",
+          tone: "negative",
           effect(gameState) {
             const penalty = Math.min(gameState.resources.ccTotal, 70);
             gameState.resources.ccTotal -= penalty;
@@ -115,6 +123,7 @@
           id: "investigate",
           labelKey: "events.sabotage.choice.investigate",
           resultKey: "events.sabotage.result.investigate",
+          tone: "positive",
           effect(gameState) {
             gameState.stats.imageVbs = Math.min(1, gameState.stats.imageVbs + 0.06);
           }
@@ -123,6 +132,7 @@
           id: "ignore",
           labelKey: "events.sabotage.choice.ignore",
           resultKey: "events.sabotage.result.ignore",
+          tone: "negative",
           effect(gameState) {
             gameState.stats.imageVbs = Math.max(0, gameState.stats.imageVbs - 0.07);
           }
@@ -167,9 +177,10 @@
     if (!choice) return null;
     choice.effect(gameState);
     const resultKey = choice.resultKey;
+    const tone = choice.tone || "mixed";
     activeEvent = null;
     cooldown = MIN_COOLDOWN;
-    return { resultKey };
+    return { resultKey, tone };
   }
 
   function startMinigame() {
@@ -181,6 +192,7 @@
   function resolveMinigame(answer, gameState) {
     if (!activeEvent || activeEvent.type !== "minigame") return null;
     const success = Number(answer) === minigameCode;
+    const tone = success ? "positive" : "negative";
     if (success) {
       gameState.resources.docBank += 80;
       gameState.stats.quality = Math.min(1, gameState.stats.quality + 0.04);
@@ -190,7 +202,7 @@
     const resultKey = success ? activeEvent.resultWinKey : activeEvent.resultLoseKey;
     activeEvent = null;
     cooldown = MIN_COOLDOWN;
-    return { resultKey, success };
+    return { resultKey, success, tone };
   }
 
   function getActiveEvent() {

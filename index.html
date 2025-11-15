@@ -8,26 +8,26 @@
   <meta name="keywords" content="idle game, clicker, printing factory, papers empire, web game, incremental">
   <meta name="author" content="Papers Empire">
   <meta name="theme-color" content="#0f172a">
-  <link rel="canonical" href="https://nclsppr.github.io/paper-empire/">
+  <link rel="canonical" href="https://papersempire.com/">
   <link rel="icon" href="assets/images/social-card.svg" type="image/svg+xml">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Papers Empire">
   <meta property="og:description" content="Automatise ton imprimerie, débloque des upgrades et domine la galaxie du document.">
-  <meta property="og:url" content="https://nclsppr.github.io/paper-empire/">
-  <meta property="og:image" content="https://nclsppr.github.io/paper-empire/assets/images/social-card.svg">
+  <meta property="og:url" content="https://papersempire.com/">
+  <meta property="og:image" content="https://papersempire.com/assets/images/social-card.svg">
   <meta property="og:locale" content="fr_FR">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Papers Empire">
   <meta name="twitter:description" content="Idle game de gestion d’imprimerie: upgrades, prestige, événements et plus encore.">
-  <meta name="twitter:image" content="https://nclsppr.github.io/paper-empire/assets/images/social-card.svg">
+  <meta name="twitter:image" content="https://papersempire.com/assets/images/social-card.svg">
   <link rel="stylesheet" href="assets/css/style.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "VideoGame",
     "name": "Papers Empire",
-    "url": "https://nclsppr.github.io/paper-empire/",
-    "image": "https://nclsppr.github.io/paper-empire/assets/images/social-card.svg",
+    "url": "https://papersempire.com/",
+    "image": "https://papersempire.com/assets/images/social-card.svg",
     "description": "Idle game web où vous modernisez une imprimerie, débloquez des bâtiments et optimisez votre production de documents.",
     "operatingSystem": "Any",
     "applicationCategory": "GameApplication",
@@ -57,9 +57,11 @@
       </select>
     </div>
     <div class="header-tagline" data-i18n="app.tagline"></div>
-  </div>
-  </div>
 </header>
+<div class="event-banner hidden" id="eventBanner" aria-live="polite">
+  <span id="eventBannerText"></span>
+  <button id="closeEventBanner" aria-label="Fermer">×</button>
+</div>
 <main id="mainContent" class="app" role="main">
   <!-- Colonne gauche: clic + stats -->
   <div class="layout-column" aria-label="Production et clics automatiques">
@@ -159,11 +161,6 @@
       <div class="tab-panel hidden" id="journalPanel">
         <div class="log-panel" id="logPanel" aria-live="polite"></div>
       </div>
-    </div>
-
-    <div class="card news-card" role="region" aria-label="Actualités">
-      <h2 data-i18n="sections.newsTitle"></h2>
-      <div class="news-list" id="newsTicker" aria-live="polite"></div>
     </div>
 
     <div class="card progress-card" role="region" aria-label="Progression, sauvegarde et accessibilité">
