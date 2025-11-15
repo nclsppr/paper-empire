@@ -488,14 +488,31 @@
       cursor: pointer;
       text-align: left;
       display: inline-flex;
-      gap: 6px;
-      align-items: center;
+      gap: 10px;
+      align-items: flex-start;
     }
 
     .building-name-button:focus-visible {
       outline: 2px solid rgba(56, 189, 248, 0.9);
       outline-offset: 2px;
       border-radius: 6px;
+    }
+
+    .building-emoji {
+      font-size: clamp(24px, 4vw, 36px);
+      line-height: 1;
+      flex-shrink: 0;
+      filter: drop-shadow(0 6px 10px rgba(15, 23, 42, 0.6));
+    }
+
+    .pref-large-text .building-emoji {
+      font-size: clamp(30px, 5vw, 42px);
+    }
+
+    .building-name-label {
+      font-size: var(--heading-sub);
+      line-height: 1.2;
+      letter-spacing: 0.01em;
     }
 
     .building-tooltip {

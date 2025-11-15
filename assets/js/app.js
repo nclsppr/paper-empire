@@ -1632,7 +1632,14 @@
       nameButton.type = "button";
       nameButton.className = "building-name-button";
       const emoji = b.emoji || "🏗️";
-      nameButton.textContent = `${emoji} ${getBuildingName(b)}`;
+      const emojiSpan = document.createElement("span");
+      emojiSpan.className = "building-emoji";
+      emojiSpan.textContent = emoji;
+      const labelSpan = document.createElement("span");
+      labelSpan.className = "building-name-label";
+      labelSpan.textContent = getBuildingName(b);
+      nameButton.appendChild(emojiSpan);
+      nameButton.appendChild(labelSpan);
 
       const tooltip = document.createElement("div");
       tooltip.className = "building-tooltip hidden";
