@@ -73,7 +73,15 @@
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 4px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     .header-title {
@@ -552,6 +560,9 @@
       .header-inner {
         text-align: center;
         align-items: center;
+      }
+      .header-top {
+        justify-content: center;
       }
       .click-button {
         font-size: 15px;

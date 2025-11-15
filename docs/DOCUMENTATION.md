@@ -4,7 +4,7 @@ This document captures the current architecture of the game, how the files are o
 
 ## 1. Project Overview
 
-Victor Buck Tycoon is a fully client-side incremental/tycoon experience. All state lives in `app.js`, and rendering is performed with vanilla DOM APIs. There is no build step by design so that you can double-click `victorzoo.html` and play.
+Victor Buck Tycoon is a fully client-side incremental/tycoon experience. All state lives in `app.js`, and rendering is performed with vanilla DOM APIs. There is no build step by design so that you can double-click `index.html` and play.
 
 Key features:
 
@@ -17,7 +17,7 @@ Key features:
 
 ```
 victorzoo/
-├── victorzoo.html          # Markup shell referencing styles + scripts
+├── index.html          # Markup shell referencing styles + scripts
 ├── assets/
 │   ├── css/
 │   │   └── style.css      # All layout/visual rules
@@ -36,7 +36,7 @@ The helper modules live under `assets/js` so they can be imported by both the br
 
 ## 3. Running the Game
 
-1. Open `victorzoo.html` in any modern browser (Chrome, Firefox, Edge, Safari).
+1. Open `index.html` in any modern browser (Chrome, Firefox, Edge, Safari).
 2. Switch languages via the FR/EN picker in the top-left corner.
 3. Click `Imprimer un document` to start generating DOC, then purchase buildings/upgrades as funds allow.
 

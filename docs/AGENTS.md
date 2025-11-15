@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-- `victorzoo.html`: Main game entry point (HTML, CSS, JS in one file).
+- `index.html`: Main game entry point (HTML, CSS, JS in one file).
 - `game-design.md`: Design notes, mechanics, and future ideas.
 - `README.md`: High‑level overview and setup notes (now housed in `docs/`).
 - Keep any new assets (images, audio, data) in a clearly named folder at the repo root (e.g., `assets/`, `data/`).
@@ -16,7 +16,7 @@
 
 ## Build, Test, and Development Commands
 
-- Open `victorzoo.html` directly in a browser for quick manual testing.
+- Open `index.html` directly in a browser for quick manual testing.
 - For local static hosting, use any simple HTTP server (for example: `python -m http.server` from the repo root).
 - Prefer testing in at least two browsers (e.g., Chrome + Firefox) when changing core gameplay or layout.
 
@@ -24,7 +24,7 @@
 
 - Use 2‑space indentation for HTML, CSS, and JavaScript.
 - Favor descriptive names: `feedAnimalButton`, `habitatGrid`, `scoreDisplay` rather than `btn1` or `x`.
-- Group related functions and logic together inside `victorzoo.html`; keep DOM queries near the top of the script section.
+- Group related functions and logic together inside `index.html`; keep DOM queries near the top of the script section.
 - When adding external files (e.g., `script.js`, `styles.css`), mirror the existing inline style and structure.
 
 ## Testing Guidelines

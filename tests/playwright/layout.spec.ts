@@ -1,7 +1,7 @@
 import path from "node:path";
 import { test, expect } from "@playwright/test";
 
-const htmlPath = path.resolve(__dirname, "../../victorzoo.html");
+const htmlPath = path.resolve(__dirname, "../../index.html");
 
 const fileUrl = "file://" + htmlPath.replace(/\\/g, "/");
 
