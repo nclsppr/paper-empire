@@ -6,6 +6,12 @@
       color-scheme: dark;
     }
 
+    :root.pref-large-text {
+      font-size: 18px;
+      --text-base: 18px;
+      --heading-size: 22px;
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -22,6 +28,41 @@
       scroll-behavior: smooth;
       width: 100%;
       box-sizing: border-box;
+    }
+
+    .pref-high-contrast body {
+      background: #000;
+      color: #fff;
+    }
+
+    .pref-high-contrast .card {
+      background: #0f172a;
+      border-color: #fef08a;
+      box-shadow: 0 0 0 2px rgba(254, 240, 138, 0.4);
+    }
+
+    .pref-high-contrast .btn-slim,
+    .pref-high-contrast .btn-god-mode,
+    .pref-high-contrast .btn-prestige {
+      border-color: #fef08a;
+      color: #fef08a;
+    }
+
+    .pref-high-contrast .btn-prestige {
+      background: linear-gradient(135deg, #fde047, #f97316);
+      color: #1f2937;
+    }
+
+    .pref-high-contrast .tag {
+      border-color: #fef08a;
+      color: #fef08a;
+    }
+
+    .pref-reduce-motion *,
+    .pref-reduce-motion *::before,
+    .pref-reduce-motion *::after {
+      animation: none !important;
+      transition: none !important;
     }
 
     *,
@@ -632,9 +673,36 @@
       align-items: center;
 }
 
-.achievement-status {
+    .achievement-status {
       font-size: 11px;
       color: #94a3b8;
+    }
+
+    .accessibility-panel {
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 8px;
+      padding: 4px 8px;
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .accessibility-panel summary {
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .accessibility-options {
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .option-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
     }
 
     @media (max-width: 960px) {

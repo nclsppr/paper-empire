@@ -30,10 +30,7 @@
     root.classList.toggle("pref-reduce-motion", !!prefs.reduceMotion);
   }
 
-  function init() {
-    const prefs = loadPrefs();
-    applyPrefs(prefs);
-
+  function init(prefs) {
     const highContrast = document.getElementById("toggleHighContrast");
     const largeText = document.getElementById("toggleLargeText");
     const reduceMotion = document.getElementById("toggleReduceMotion");
@@ -64,5 +61,7 @@
     }
   }
 
-  window.addEventListener("DOMContentLoaded", init);
+  const initialPrefs = loadPrefs();
+  applyPrefs(initialPrefs);
+  window.addEventListener("DOMContentLoaded", () => init(initialPrefs));
 })();
