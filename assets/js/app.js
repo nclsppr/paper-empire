@@ -14,176 +14,12 @@
   // Internationalisation + état UI
   // -------------------------------
 
-  const I18N = {
-    fr: {
-      "app.browserTitle": "Victor Buck Tycoon",
-      "app.title": "Victor Buck Tycoon",
-      "app.tagline": "Transforme ton imprimerie en usine 4.0 omnicanale.",
-      "stats.docBank": "Documents disponibles 📄",
-      "stats.docTotal": "Total documents 📈",
-      "stats.ccTotal": "Confiance client ⭐",
-      "stats.docPs": "Production actuelle",
-      "stats.docPsValue": "{{amount}} DOC/s",
-      "actions.printDocument": "Imprimer un document",
-      "actions.buy": "Acheter",
-      "actions.tooExpensive": "Trop cher",
-      "gauges.quality": "Qualité ✅",
-      "gauges.footprint": "Empreinte papier 🌳",
-      "gauges.image": "Image VBS 🏅",
-      "chips.culture": "Culture d'entreprise ✨",
-      "chips.prestige": "Prestige global x",
-      "sections.buildingsTitle": "Bâtiments de production 🏭",
-      "sections.buildingsHint": "Achète des paliers pour automatiser tes documents traités.",
-      "sections.upgradesTitle": "Améliorations et prestige 🚀",
-      "sections.upgradesHint": "Upgrades globales de base (MVP). Tu pourras en rajouter.",
-      "sections.prestigeTitle": "Réorg stratégique 🔁",
-      "sections.logTitle": "Journal d'activité 📰",
-      "sections.godModeTitle": "God mode 🦊",
-      "label.costDoc": "Coût : {{amount}} DOC",
-      "label.quantity": "Quantité : {{count}}",
-      "label.productionPerUnit": "Prod : {{amount}} DOC/s par unité",
-      "label.totalProduction": "Total : {{amount}} DOC/s",
-      "label.totalProductionNA": "Total : -",
-      "label.modifierOnly": "Modificateur",
-      "label.modifierPerUnit": "Impact/unité : {{impact}}",
-      "label.modifierTotal": "Impact total : {{impact}}",
-      "label.modifierImpactNA": "Impact total : -",
-      "label.modifierPerUnitNA": "Impact/unité : -",
-      "impact.doc": "DOC",
-      "impact.cc": "Confiance",
-      "impact.quality": "Qualité",
-      "impact.footprint": "Empreinte",
-      "impact.image": "Image",
-      "label.noUpgrade": "Pas d'amélioration disponible pour le moment.",
-      "buildings.noneAffordable": "Accumule davantage de documents pour débloquer de nouveaux bâtiments.",
-      "godMode.hint": "Tape « renard » pour dévoiler les contrôles. Ajuste la vitesse du temps avec prudence.",
-      "godMode.status": "Vitesse actuelle : x{{scale}}",
-      "prestige.infoLocked": "Réinitialise l'usine pour gagner de la culture d'entreprise. Minimum requis : {{min}} points de confiance cumulés.",
-      "prestige.infoAvailable": "Tu peux lancer une réorganisation stratégique. Tu perdras tes bâtiments et DOC, mais tu gagneras {{gain}} point(s) de culture d'entreprise.",
-      "prestige.buttonLocked": "Réorg stratégique indisponible",
-      "prestige.buttonAvailable": "Réorganiser maintenant (+{{gain}} culture)",
-      "prestige.confirm": "Lancer une réorganisation stratégique et tout réinitialiser pour gagner {{gain}} point(s) de culture d'entreprise ?",
-      "log.welcome": "Bienvenue chez Victor Buck Tycoon. Commence à cliquer pour imprimer tes premiers documents. 📄",
-      "log.incident": "Petit incident de production. La qualité baisse légèrement.",
-      "log.optimization": "Optimisation imprévue : tu réduis un peu ton empreinte papier.",
-      "log.buyBuilding": "Tu achètes {{name}} (total : {{total}}).",
-      "log.buyUpgrade": "Upgrade achetée : {{name}}.",
-      "log.prestige": "Réorganisation stratégique : +{{amount}} point(s) de culture d'entreprise.",
-      "building.reproOperator.name": "Opérateur repro",
-      "building.reproOperator.desc": "Surveille les copieurs, recharge le papier, relance les impressions.",
-      "building.reproWorkshop.name": "Atelier reprographie",
-      "building.reproWorkshop.desc": "Plusieurs copieurs alignés, plastifieuse, relieuse.",
-      "building.digitalPress.name": "Presse numérique",
-      "building.digitalPress.desc": "Les premières grosses machines industrielles.",
-      "building.offsetPress.name": "Presse offset",
-      "building.offsetPress.desc": "Pour les très grands tirages.",
-      "building.finishingWorkshop.name": "Atelier de finition",
-      "building.finishingWorkshop.desc": "Massicots, plieuses, agrafeuses pour finaliser les lots.",
-      "building.insertingLine.name": "Ligne de mise sous pli",
-      "building.insertingLine.desc": "Met les documents dans les enveloppes, timbre et prépare l'envoi.",
-      "building.logistics.name": "Logistique et tri postal",
-      "building.logistics.desc": "Bacs, palettes, camions postaux pour fiabiliser les expéditions.",
-      "building.vbsPortal.name": "VPlatform / VBS Portal",
-      "building.vbsPortal.desc": "Les clients envoient leurs flux via la plateforme sécurisée.",
-      "building.comBridge.name": "ComBridge omnicanal",
-      "building.comBridge.desc": "Courrier, email, SMS, portail : tout dans le même flux.",
-      "building.factory40.name": "Usine Victor Buck 4.0",
-      "building.factory40.desc": "Capteurs, robots logistiques et monitoring temps réel.",
-      "building.pampyAI.name": "IA Pampy Print",
-      "building.pampyAI.desc": "Prédit les pics, optimise les jobs, réduit le gâchis papier.",
-      "upgrade.upg_click_power_1.name": "Imprimeur motivé 💪",
-      "upgrade.upg_click_power_1.desc": "Le clic manuel produit 2 fois plus de documents.",
-      "upgrade.upg_global_prod_1.name": "Organisation du flux 📦",
-      "upgrade.upg_global_prod_1.desc": "Production globale de tous les bâtiments +20 %. ",
-      "upgrade.upg_quality_boost_1.name": "Contrôle qualité renforcé 🔍",
-      "upgrade.upg_quality_boost_1.desc": "Qualité de base +10 points."
-    },
-    en: {
-      "app.browserTitle": "Victor Buck Tycoon",
-      "app.title": "Victor Buck Tycoon",
-      "app.tagline": "Turn your print shop into a 4.0 omnichannel factory.",
-      "stats.docBank": "Documents available 📄",
-      "stats.docTotal": "Documents total 📈",
-      "stats.ccTotal": "Customer trust ⭐",
-      "stats.docPs": "Current production",
-      "stats.docPsValue": "{{amount}} DOC/s",
-      "actions.printDocument": "Print a document",
-      "actions.buy": "Buy",
-      "actions.tooExpensive": "Too expensive",
-      "gauges.quality": "Quality ✅",
-      "gauges.footprint": "Paper footprint 🌳",
-      "gauges.image": "VBS image 🏅",
-      "chips.culture": "Company culture ✨",
-      "chips.prestige": "Global prestige x",
-      "sections.buildingsTitle": "Production buildings 🏭",
-      "sections.buildingsHint": "Buy tiers to automate your processed documents.",
-      "sections.upgradesTitle": "Upgrades & prestige 🚀",
-      "sections.upgradesHint": "Core MVP upgrades. Add more as you grow.",
-      "sections.prestigeTitle": "Strategic reorg 🔁",
-      "sections.logTitle": "Activity log 📰",
-      "sections.godModeTitle": "God mode 🦊",
-      "label.costDoc": "Cost: {{amount}} DOC",
-      "label.quantity": "Quantity: {{count}}",
-      "label.productionPerUnit": "Prod: {{amount}} DOC/s per unit",
-      "label.totalProduction": "Total: {{amount}} DOC/s",
-      "label.totalProductionNA": "Total: -",
-      "label.modifierOnly": "Modifier",
-      "label.modifierPerUnit": "Impact/unit: {{impact}}",
-      "label.modifierTotal": "Total impact: {{impact}}",
-      "label.modifierImpactNA": "Total impact: -",
-      "label.modifierPerUnitNA": "Impact/unit: -",
-      "impact.doc": "DOC",
-      "impact.cc": "Trust",
-      "impact.quality": "Quality",
-      "impact.footprint": "Footprint",
-      "impact.image": "Image",
-      "label.noUpgrade": "No upgrade available right now.",
-      "buildings.noneAffordable": "Print more documents to unlock the next building tier.",
-      "godMode.hint": "Type “renard” while focused on the window to reveal the controls. Handle time with care.",
-      "godMode.status": "Current speed: x{{scale}}",
-      "prestige.infoLocked": "Reset the factory to gain company culture. Minimum required: {{min}} cumulative trust points.",
-      "prestige.infoAvailable": "You can trigger a strategic reorg. You'll lose your buildings and DOC but gain {{gain}} company culture point(s).",
-      "prestige.buttonLocked": "Strategic reorg unavailable",
-      "prestige.buttonAvailable": "Reorganize now (+{{gain}} culture)",
-      "prestige.confirm": "Launch a strategic reorganisation and reset everything to gain {{gain}} culture point(s)?",
-      "log.welcome": "Welcome to Victor Buck Tycoon. Start clicking to print your first documents. 📄",
-      "log.incident": "Minor production incident. Quality drops slightly.",
-      "log.optimization": "Unexpected optimization: you shrink your paper footprint a bit.",
-      "log.buyBuilding": "You buy {{name}} (total: {{total}}).",
-      "log.buyUpgrade": "Upgrade purchased: {{name}}.",
-      "log.prestige": "Strategic reorg: +{{amount}} company culture point(s).",
-      "building.reproOperator.name": "Copy room operator",
-      "building.reproOperator.desc": "Keeps copiers running, refills paper, restarts jobs.",
-      "building.reproWorkshop.name": "Reprography workshop",
-      "building.reproWorkshop.desc": "Several copiers in row plus laminators and binders.",
-      "building.digitalPress.name": "Digital press",
-      "building.digitalPress.desc": "First industrial-scale machines.",
-      "building.offsetPress.name": "Offset press",
-      "building.offsetPress.desc": "Handles the very large print runs.",
-      "building.finishingWorkshop.name": "Finishing workshop",
-      "building.finishingWorkshop.desc": "Cutters, folders and staplers to finish the lots.",
-      "building.insertingLine.name": "Mail inserting line",
-      "building.insertingLine.desc": "Stuff documents into envelopes, stamp them and prep shipping.",
-      "building.logistics.name": "Logistics & postal sorting",
-      "building.logistics.desc": "Trays, pallets and postal trucks to secure shipments.",
-      "building.vbsPortal.name": "VPlatform / VBS Portal",
-      "building.vbsPortal.desc": "Clients send their data flows through the secure portal.",
-      "building.comBridge.name": "ComBridge omnichannel",
-      "building.comBridge.desc": "Mail, email, SMS and portal in the same workflow.",
-      "building.factory40.name": "Victor Buck Factory 4.0",
-      "building.factory40.desc": "Sensors everywhere, logistics bots, real-time monitoring.",
-      "building.pampyAI.name": "Pampy Print AI",
-      "building.pampyAI.desc": "Predicts peaks, optimises jobs and reduces paper waste.",
-      "upgrade.upg_click_power_1.name": "Motivated printer 💪",
-      "upgrade.upg_click_power_1.desc": "Manual clicks produce twice as many documents.",
-      "upgrade.upg_global_prod_1.name": "Flow organisation 📦",
-      "upgrade.upg_global_prod_1.desc": "Global production +20% for every building.",
-      "upgrade.upg_quality_boost_1.name": "Boosted quality control 🔍",
-      "upgrade.upg_quality_boost_1.desc": "Base quality +10 percentage points."
-    }
-  };
-
-  let currentLang = (navigator.language || "fr").toLowerCase().startsWith("en") ? "en" : "fr";
+  const SUPPORTED_LANGS = ["fr", "en", "de", "lb"];
+  const DEFAULT_LANG = "fr";
+  let currentLang = (navigator.language || DEFAULT_LANG).slice(0, 2).toLowerCase();
+  if (!SUPPORTED_LANGS.includes(currentLang)) {
+    currentLang = DEFAULT_LANG;
+  }
 
   /** Tracks which sections need a render refresh. */
   const uiState = {
@@ -453,10 +289,15 @@
   }
 
   /** Simple translation helper that handles string interpolation. */
+  function getI18nDict(lang) {
+    const dicts = window.I18N || {};
+    return dicts[lang] || dicts[DEFAULT_LANG] || {};
+  }
+
   function t(key, params = {}) {
-    const dict = I18N[currentLang] || I18N.fr;
-    const fallback = I18N.fr[key] || key;
-    const template = dict[key] || fallback;
+    const dict = getI18nDict(currentLang);
+    const fallbackDict = getI18nDict(DEFAULT_LANG);
+    const template = dict[key] || fallbackDict[key] || key;
     return template.replace(/\{\{(\w+)\}\}/g, (_, token) => {
       return params[token] !== undefined ? params[token] : "";
     });
@@ -475,8 +316,8 @@
 
   /** Updates the current language and re-renders the UI. */
   function setLanguage(lang) {
-    if (!I18N[lang]) {
-      lang = "fr";
+    if (!SUPPORTED_LANGS.includes(lang)) {
+      lang = DEFAULT_LANG;
     }
     currentLang = lang;
     if (DOM.langSelect && DOM.langSelect.value !== lang) {
