@@ -7,6 +7,7 @@
    */
   const DOM = {};
 
+  const GAME_TITLE = window.GAME_TITLE || "Victor Buck Tycoon";
   const { computeBuildingEffects, getBuildingImpact } = ModifierUtils;
   const { sanitizeTimeScale, updateCheatProgress } = GodModeUtils;
 
@@ -311,7 +312,14 @@
       const key = el.getAttribute("data-i18n");
       el.textContent = t(key);
     });
+    applyGameTitle();
     renderGodModePanel(true);
+  }
+
+  function applyGameTitle() {
+    document.querySelectorAll("[data-game-title]").forEach(el => {
+      el.textContent = GAME_TITLE;
+    });
   }
 
   /** Updates the current language and re-renders the UI. */
@@ -636,6 +644,10 @@
     gameState.resources.docTotal += docGain;
     refreshUpgradeUnlocks();
     renderAll();
+    if (DOM.clickButton) {
+      DOM.clickButton.classList.add("pulse");
+      setTimeout(() => DOM.clickButton && DOM.clickButton.classList.remove("pulse"), 350);
+    }
   }
 
   /** Purchases a building if the player can afford it. */

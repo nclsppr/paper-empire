@@ -7,12 +7,18 @@
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+<header class="app-header">
+  <div class="header-inner">
+    <div class="header-title" data-game-title></div>
+    <div class="header-tagline" data-i18n="app.tagline"></div>
+  </div>
+</header>
 <div class="app">
   <!-- Colonne gauche: clic + stats -->
   <div class="layout-column">
     <div class="card">
       <div class="flex-row">
-        <h1 data-i18n="app.title"></h1>
+        <h1 data-game-title></h1>
         <select id="langSelect" class="lang-select">
           <option value="fr">FR</option>
           <option value="en">EN</option>
