@@ -3,6 +3,13 @@ output: docs-site
 branding:
   title: Papers Empire Docs
   label: v0.6
+navigation:
+  - Overview: README.md
+  - Architecture: architecture.md
+  - Accessibility: accessibility.md
+  - Game Design: game-design.md
+  - Release Notes: RELEASE_NOTES.md
+  - Codex is thinking: codex-is-thinking.md
 links:
   - text: Game Repo
     link: https://github.com/nclsppr/paper-empire

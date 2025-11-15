@@ -31,3 +31,9 @@ When you make notable changes (new features, mechanics, UI improvements), append
 
 - Features (skip link, ARIA regions, log announcements, accessibility panel for high contrast/large text/reduced motion) are documented in `accessibility.md`.
 - Preferences persist automatically (localStorage) and are applied before rendering to avoid flashes.
+
+## Architecture & Notes
+
+- Lire [`architecture.md`](architecture.md) pour les flux techniques, la description des modules et les diagrammes PlantUML (autosave, achievements, etc.).
+- Pour la vision gameplay, continuer avec [`game-design.md`](game-design.md).
+- Le carnet de réflexions ouvert se trouve dans [`codex-is-thinking.md`](codex-is-thinking.md).
