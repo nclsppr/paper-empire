@@ -112,6 +112,16 @@
       <div class="log-panel" id="logPanel"></div>
     </div>
 
+    <div class="card progress-card">
+      <h2 data-i18n="sections.progressTitle"></h2>
+      <div class="progress-actions">
+        <button class="btn-slim" id="exportSaveBtn" data-i18n="actions.exportSave"></button>
+        <button class="btn-slim" id="importSaveBtn" data-i18n="actions.importSave"></button>
+        <button class="btn-slim danger" id="resetSaveBtn" data-i18n="actions.resetSave"></button>
+      </div>
+      <div class="achievements-list" id="achievementsList"></div>
+    </div>
+
     <div class="card god-mode-card hidden" id="godModeCard" aria-hidden="true">
       <h2 data-i18n="sections.godModeTitle"></h2>
       <div class="small" data-i18n="godMode.hint"></div>
@@ -130,6 +140,8 @@
   <script src="assets/i18n/en.js"></script>
   <script src="assets/i18n/de.js"></script>
   <script src="assets/i18n/lb.js"></script>
+  <script src="assets/js/persistence.js"></script>
+  <script src="assets/js/achievements.js"></script>
   <script src="assets/js/modifier-utils.js"></script>
   <script src="assets/js/godmode-utils.js"></script>
   <script src="assets/js/app.js" defer></script>

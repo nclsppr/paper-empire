@@ -151,6 +151,7 @@
       color: #f9fafb;
       padding: 4px 8px;
       font-size: var(--text-base);
+      min-width: 72px;
     }
 
     .stats-main {
@@ -531,6 +532,74 @@
       font-size: var(--text-base);
       border: 1px solid rgba(148, 163, 184, 0.6);
       background: rgba(15, 23, 42, 0.95);
+    }
+
+    .progress-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .progress-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-slim {
+      border: 1px solid rgba(248, 250, 252, 0.4);
+      background: transparent;
+      color: #f8fafc;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.1s ease;
+    }
+
+    .btn-slim:hover {
+      background: rgba(248, 250, 252, 0.1);
+    }
+
+    .btn-slim.danger {
+      border-color: rgba(248, 113, 113, 0.8);
+      color: #fecaca;
+    }
+
+    .achievements-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .achievement-item {
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 6px 8px;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .achievement-item.unlocked {
+      border-color: rgba(74, 222, 128, 0.7);
+      background: rgba(22, 163, 74, 0.1);
+    }
+
+    .achievement-title {
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .achievement-status {
+      font-size: 11px;
+      color: #94a3b8;
     }
 
     @media (max-width: 960px) {

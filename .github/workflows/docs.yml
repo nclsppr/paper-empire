@@ -38,8 +38,8 @@ jobs:
           # cp -r assets _site/ (exemple)
           
           # Copier la doc dans le sous-répertoire /docs
-          mkdir -p _site/docs
-          cp -r docs-site/* _site/docs/
+          mkdir -p _site/documentation
+          cp -r docs-site/* _site/documentation/
       
       - uses: actions/upload-pages-artifact@v3
         with:

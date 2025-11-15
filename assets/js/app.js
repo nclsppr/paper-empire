@@ -58,6 +58,12 @@
     log: []
   };
 
+  const achievementsState = {
+    unlocked: {}
+  };
+
+  let saveTimer = null;
+
   /** Static blueprint for every building available in the MVP. */
   const BUILDING_DEFS = [
     {
@@ -258,6 +264,10 @@
     DOM.logPanel = document.getElementById("logPanel");
     DOM.godModeCard = document.getElementById("godModeCard");
     DOM.godModeStatus = document.getElementById("godModeStatus");
+    DOM.achievementsList = document.getElementById("achievementsList");
+    DOM.exportSaveBtn = document.getElementById("exportSaveBtn");
+    DOM.importSaveBtn = document.getElementById("importSaveBtn");
+    DOM.resetSaveBtn = document.getElementById("resetSaveBtn");
   }
 
   /** Hooks click events to the main CTAs. */
@@ -274,6 +284,16 @@
           doPrestige();
         }
       });
+    }
+
+    if (DOM.exportSaveBtn) {
+      DOM.exportSaveBtn.addEventListener("click", handleExportSave);
+    }
+    if (DOM.importSaveBtn) {
+      DOM.importSaveBtn.addEventListener("click", handleImportSave);
+    }
+    if (DOM.resetSaveBtn) {
+      DOM.resetSaveBtn.addEventListener("click", handleResetSave);
     }
 
     document.addEventListener("click", event => {
@@ -314,12 +334,51 @@
     });
     applyGameTitle();
     renderGodModePanel(true);
+    renderAchievementsPanel();
   }
 
   function applyGameTitle() {
     document.querySelectorAll("[data-game-title]").forEach(el => {
       el.textContent = GAME_TITLE;
     });
+  }
+
+  function handleExportSave() {
+    if (!Persistence.isAvailable || !Persistence.isAvailable()) {
+      alert(t("actions.saveUnavailable"));
+      return;
+    }
+    queueSave(true);
+    const data = Persistence.exportData();
+    if (!data) {
+      alert(t("actions.exportError"));
+      return;
+    }
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(data).then(
+        () => alert(t("actions.exportSuccess")),
+        () => prompt(t("actions.exportPrompt"), data)
+      );
+    } else {
+      prompt(t("actions.exportPrompt"), data);
+    }
+  }
+
+  function handleImportSave() {
+    const raw = prompt(t("actions.importPrompt"));
+    if (!raw) return;
+    const ok = Persistence.importData ? Persistence.importData(raw) : false;
+    if (!ok) {
+      alert(t("actions.importError"));
+      return;
+    }
+    location.reload();
+  }
+
+  function handleResetSave() {
+    if (!confirm(t("actions.resetConfirm"))) return;
+    Persistence.clear && Persistence.clear();
+    location.reload();
   }
 
   /** Updates the current language and re-renders the UI. */
@@ -392,6 +451,8 @@
       }
     ];
 
+    applyPersistedState(Persistence.load ? Persistence.load() : null);
+
     uiState.buildingsDirty = true;
     uiState.upgradesDirty = true;
     refreshUpgradeUnlocks(true);
@@ -399,6 +460,61 @@
     renderAll(true);
     gameState.time.lastUpdate = performance.now();
     requestAnimationFrame(gameLoop);
+  }
+
+  function buildPersistedState() {
+    return {
+      version: 1,
+      resources: { ...gameState.resources },
+      stats: { ...gameState.stats },
+      buildings: gameState.buildings.map(b => ({ id: b.id, quantity: b.quantity })),
+      upgrades: gameState.upgrades.map(u => ({ id: u.id, purchased: !!u.purchased })),
+      achievements: achievementsState.unlocked
+    };
+  }
+
+  function applyPersistedState(saved) {
+    if (!saved) return;
+    if (saved.resources) {
+      Object.assign(gameState.resources, saved.resources);
+    }
+    if (saved.stats) {
+      Object.assign(gameState.stats, saved.stats);
+    }
+    if (Array.isArray(saved.buildings)) {
+      for (const entry of saved.buildings) {
+        const target = gameState.buildings.find(b => b.id === entry.id);
+        if (target && typeof entry.quantity === "number") {
+          target.quantity = entry.quantity;
+        }
+      }
+    }
+    if (Array.isArray(saved.upgrades)) {
+      for (const entry of saved.upgrades) {
+        const target = gameState.upgrades.find(u => u.id === entry.id);
+        if (target) {
+          target.purchased = !!entry.purchased;
+        }
+      }
+    }
+    if (saved.achievements) {
+      achievementsState.unlocked = { ...saved.achievements };
+    }
+  }
+
+  function queueSave(force = false) {
+    if (!Persistence.isAvailable || !Persistence.isAvailable()) return;
+    if (force) {
+      if (saveTimer) clearTimeout(saveTimer);
+      saveTimer = null;
+      Persistence.save(buildPersistedState());
+      return;
+    }
+    if (saveTimer) return;
+    saveTimer = setTimeout(() => {
+      Persistence.save(buildPersistedState());
+      saveTimer = null;
+    }, 500);
   }
 
   /** Formats numbers following simple thresholds for readability. */
@@ -612,6 +728,8 @@
 
     refreshUpgradeUnlocks();
     maybeSpawnSmallEvents(dt);
+    checkAchievements();
+    queueSave();
   }
 
   /** introduces occasional incidents/optimisations to keep gauges dynamic. */
@@ -643,6 +761,8 @@
     gameState.resources.docBank += docGain;
     gameState.resources.docTotal += docGain;
     refreshUpgradeUnlocks();
+    checkAchievements();
+    queueSave();
     renderAll();
     if (DOM.clickButton) {
       DOM.clickButton.classList.add("pulse");
@@ -662,6 +782,8 @@
     uiState.buildingsDirty = true;
     logMessage("log.buyBuilding", { name: getBuildingName(b), total: b.quantity });
     refreshUpgradeUnlocks();
+    checkAchievements();
+    queueSave();
     renderAll();
   }
 
@@ -676,6 +798,8 @@
     upg.purchased = true;
     uiState.upgradesDirty = true;
     logMessage("log.buyUpgrade", { name: getUpgradeName(upg) });
+    checkAchievements();
+    queueSave();
     renderAll();
   }
 
@@ -716,6 +840,8 @@
     uiState.buildingsDirty = true;
     uiState.upgradesDirty = true;
     logMessage("log.prestige", { amount: gain });
+    checkAchievements();
+    queueSave(true);
     renderAll(true);
   }
 
@@ -775,6 +901,46 @@
       div.textContent = "[" + timeLabel + "] " + text;
       DOM.logPanel.appendChild(div);
     }
+  }
+
+  function renderAchievementsPanel() {
+    const container = DOM.achievementsList;
+    if (!container || !window.Achievements) return;
+    container.innerHTML = "";
+    if (!Achievements.definitions.length) {
+      container.innerHTML = `<div class="small">${t("achievements.empty")}</div>`;
+      return;
+    }
+    for (const def of Achievements.definitions) {
+      const unlockedAt = achievementsState.unlocked[def.id];
+      const item = document.createElement("div");
+      item.className = "achievement-item" + (unlockedAt ? " unlocked" : "");
+      const title = document.createElement("div");
+      title.className = "achievement-title";
+      title.innerHTML = `<span>${t(def.nameKey)}</span><span class="achievement-status">${t(unlockedAt ? "achievements.statusUnlocked" : "achievements.statusLocked")}</span>`;
+      const desc = document.createElement("div");
+      desc.textContent = t(def.descKey);
+      item.appendChild(title);
+      item.appendChild(desc);
+      container.appendChild(item);
+    }
+  }
+
+  function checkAchievements() {
+    if (!window.Achievements) return;
+    const unlockedMap = achievementsState.unlocked;
+    const newly = Achievements.evaluate(gameState, unlockedMap);
+    if (!newly.length) return;
+    const now = Date.now();
+    for (const id of newly) {
+      unlockedMap[id] = now;
+      const def = Achievements.definitions.find(d => d.id === id);
+      if (def) {
+        logMessage("log.achievement", { name: t(def.nameKey) });
+      }
+    }
+    renderAchievementsPanel();
+    queueSave(true);
   }
 
   /** Toggles the affordability state for each building action button. */
@@ -993,6 +1159,7 @@
     renderStats();
     renderPrestige();
     renderLog();
+    renderAchievementsPanel();
     renderGodModePanel();
     syncBuildingUnlocks();
 
