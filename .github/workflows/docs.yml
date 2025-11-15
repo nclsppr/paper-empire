@@ -29,6 +29,7 @@ jobs:
         run: |
           mkdir -p site/docs
           cp index.html site/index.html
+          cp favicon.svg site/favicon.svg
           cp robots.txt site/robots.txt
           cp sitemap.xml site/sitemap.xml
           cp -R assets site/assets
