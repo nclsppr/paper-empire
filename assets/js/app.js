@@ -38,7 +38,8 @@
   /** Tracks which sections need a render refresh. */
   const uiState = {
     buildingsDirty: true,
-    upgradesDirty: true
+    upgradesDirty: true,
+    detailTab: "contracts"
   };
 
   /** Global model of the player progression. */
@@ -86,9 +87,11 @@
   const contractsState = {
     available: [],
     rerollCount: 0,
-    lastReroll: 0
+    lastReroll: 0,
+    unlocked: false
   };
   const CONTRACT_REROLL_COOLDOWN = 30000;
+  const CONTRACTS_UNLOCK_DOC_TOTAL = 1500;
 
   let saveTimer = null;
   let bannerHideTimer = null;
@@ -418,7 +421,8 @@
 
     document.addEventListener("keydown", handleGlobalKeydown);
 
-    switchDetailTab("contracts");
+    contractsState.unlocked = areContractsUnlocked();
+    switchDetailTab(contractsState.unlocked ? "contracts" : "journal");
   }
 
   function handleGlobalKeydown(event) {
@@ -494,12 +498,16 @@
 
   function switchDetailTab(tab) {
     if (!DOM.contractsPanel || !DOM.journalPanel) return;
-    const showContracts = tab !== "journal";
+    const unlocked = areContractsUnlocked();
+    const showContracts = tab === "contracts" && unlocked;
+    uiState.detailTab = showContracts ? "contracts" : "journal";
     DOM.contractsPanel.classList.toggle("hidden", !showContracts);
     DOM.journalPanel.classList.toggle("hidden", showContracts);
     if (DOM.contractsTab) {
+      DOM.contractsTab.classList.toggle("hidden", !unlocked);
       DOM.contractsTab.classList.toggle("active", showContracts);
       DOM.contractsTab.setAttribute("aria-selected", showContracts ? "true" : "false");
+      DOM.contractsTab.setAttribute("aria-hidden", unlocked ? "false" : "true");
     }
     if (DOM.journalTab) {
       DOM.journalTab.classList.toggle("active", !showContracts);
@@ -1270,6 +1278,10 @@
     return "🔔";
   }
 
+  function areContractsUnlocked() {
+    return (gameState.resources?.docTotal || 0) >= CONTRACTS_UNLOCK_DOC_TOTAL;
+  }
+
   function areEventsAllowed() {
     if (!Settings || typeof Settings.getPreference !== "function") {
       return true;
@@ -1370,6 +1382,11 @@
     updateRerollButton();
     if (!window.EndgameModule) return;
     if (!DOM.contractsList || !DOM.activeContractPanel) return;
+    if (!contractsState.unlocked) {
+      DOM.contractsList.innerHTML = "";
+      DOM.activeContractPanel.classList.add("hidden");
+      return;
+    }
     contractsState.available = window.EndgameModule.availableContracts(gameState);
     DOM.contractsList.innerHTML = "";
     if (!contractsState.available.length) {
@@ -1757,6 +1774,7 @@
 
   /** Draws all UI sections, honouring the dirty flags for heavy lists. */
   function renderAll(forceFull = false) {
+    ensureContractsUnlockState();
     renderStats();
     renderPrestige();
     renderLog();
@@ -1776,6 +1794,27 @@
       uiState.upgradesDirty = false;
     }
     updateUpgradeButtons();
+  }
+
+  function ensureContractsUnlockState() {
+    const unlocked = areContractsUnlocked();
+    if (contractsState.unlocked === unlocked) {
+      updateContractsTabVisibility(unlocked);
+      return;
+    }
+    contractsState.unlocked = unlocked;
+    updateContractsTabVisibility(unlocked);
+    switchDetailTab(unlocked ? "contracts" : "journal");
+  }
+
+  function updateContractsTabVisibility(unlocked) {
+    if (DOM.contractsTab) {
+      DOM.contractsTab.classList.toggle("hidden", !unlocked);
+      DOM.contractsTab.setAttribute("aria-hidden", unlocked ? "false" : "true");
+    }
+    if (!unlocked && DOM.contractsPanel) {
+      DOM.contractsPanel.classList.add("hidden");
+    }
   }
 
   /** Adds listeners to god mode controls and the hidden key sequence. */

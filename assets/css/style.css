@@ -672,14 +672,15 @@
     }
 
     .log-panel {
-      font-size: var(--text-base);
+      font-size: var(--text-small);
+      line-height: 1.4;
       max-height: 130px;
       overflow-y: auto;
       padding-right: 4px;
     }
 
     .log-entry {
-      opacity: 0.85;
+      opacity: 0.8;
       margin-bottom: 2px;
     }
 
