@@ -1,5 +1,5 @@
 ````markdown
-# Victor Buck Tycoon 📄🖨️🏭  
+# Papers Empire 📄🖨️🏭  
 Game Design Document (GDD) – version développeur
 
 ---

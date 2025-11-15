@@ -1,6 +1,6 @@
-# Victor Buck Tycoon
+# Papers Empire
 
-Victor Buck Tycoon is a browser-based incremental game that runs entirely on the client side. The experience is intentionally light-hearted: you're modernising an industrial print shop a la Victor Buck Services while channeling the vibe of workplace sitcoms.
+Papers Empire is a browser-based incremental game that runs entirely on the client side. The experience is intentionally light-hearted: you're modernising an industrial print shop a la Victor Buck Services while channeling the vibe of workplace sitcoms.
 
 The UI is now split across dedicated HTML, CSS, and JavaScript assets for easier maintenance. Additional helper modules power the modifier builder math and god-mode utilities so they can be unit-tested in isolation.
 

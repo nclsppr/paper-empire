@@ -1,4 +1,4 @@
-# Victor Buck Tycoon
+# Papers Empire
 
 All project documentation now lives inside the `docs/` directory and is published via Retype. Start with `docs/README.md` for the overview, and see `docs/AGENTS.md` for repo guidelines.
 

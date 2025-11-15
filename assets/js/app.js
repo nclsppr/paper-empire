@@ -7,7 +7,7 @@
    */
   const DOM = {};
 
-  const GAME_TITLE = window.GAME_TITLE || "Victor Buck Tycoon";
+  const GAME_TITLE = window.GAME_TITLE || "Papers Empire";
   const { computeBuildingEffects, getBuildingImpact } = ModifierUtils;
   const { sanitizeTimeScale, updateCheatProgress } = GodModeUtils;
 

@@ -1,10 +1,10 @@
-# Victor Buck Tycoon – Developer Guide
+# Papers Empire – Developer Guide
 
 This document captures the current architecture of the game, how the files are organised after the split, and the commands needed to run or extend the project.
 
 ## 1. Project Overview
 
-Victor Buck Tycoon is a fully client-side incremental/tycoon experience. All state lives in `app.js`, and rendering is performed with vanilla DOM APIs. There is no build step by design so that you can double-click `index.html` and play.
+Papers Empire is a fully client-side incremental/tycoon experience. All state lives in `app.js`, and rendering is performed with vanilla DOM APIs. There is no build step by design so that you can double-click `index.html` and play.
 
 Key features:
 

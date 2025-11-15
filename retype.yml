@@ -1,7 +1,7 @@
 input: docs
 output: docs-site
 branding:
-  title: Victor Buck Tycoon Docs
+  title: Papers Empire Docs
   label: v0.6
 links:
   - text: Game Repo

@@ -1,8 +1,8 @@
 (function(){
   window.I18N = window.I18N || {};
   window.I18N.lb = {
-    "app.browserTitle": "Victor Buck Tycoon",
-    "app.title": "Victor Buck Tycoon",
+    "app.browserTitle": "Papers Empire",
+    "app.title": "Papers Empire",
     "app.tagline": "Maach deng Dréckerei zu enger 4.0 Omnichannel-Fabrick.",
     "stats.docBank": "Disponibel Dokumenter 📄",
     "stats.docTotal": "Total Dokumenter 📈",
@@ -48,7 +48,7 @@
     "prestige.buttonLocked": "Reorg net disponibel",
     "prestige.buttonAvailable": "Elo reorganiséieren (+{{gain}} Kultur)",
     "prestige.confirm": "Reorganiséieren an alles zrécksetzen fir {{gain}} Kulturpunkt(en) ze kréien?",
-    "log.welcome": "Wëllkomm bei Victor Buck Tycoon. Fänks mat Klicks un deng éischt Dokumenter ze drécken. 📄",
+    "log.welcome": "Wëllkomm bei Papers Empire. Fänks mat Klicks un deng éischt Dokumenter ze drécken. 📄",
     "log.incident": "Klengen Incident: d'Qualitéit geet e bëssen erof.",
     "log.optimization": "Onwahrscheinlech Optimisatioun: Däin Pabeierspuer gëtt méi kleng.",
     "log.buyBuilding": "Du keefs {{name}} (total: {{total}}).",

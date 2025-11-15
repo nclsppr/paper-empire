@@ -1,8 +1,8 @@
 (function(){
   window.I18N = window.I18N || {};
   window.I18N.fr = {
-    "app.browserTitle": "Victor Buck Tycoon",
-    "app.title": "Victor Buck Tycoon",
+    "app.browserTitle": "Papers Empire",
+    "app.title": "Papers Empire",
     "app.tagline": "Transforme ton imprimerie en usine 4.0 omnicanale.",
     "stats.docBank": "Documents disponibles 📄",
     "stats.docTotal": "Total documents 📈",
@@ -48,7 +48,7 @@
     "prestige.buttonLocked": "Réorg stratégique indisponible",
     "prestige.buttonAvailable": "Réorganiser maintenant (+{{gain}} culture)",
     "prestige.confirm": "Lancer une réorganisation stratégique et tout réinitialiser pour gagner {{gain}} point(s) de culture d'entreprise ?",
-    "log.welcome": "Bienvenue chez Victor Buck Tycoon. Commence à cliquer pour imprimer tes premiers documents. 📄",
+    "log.welcome": "Bienvenue chez Papers Empire. Commence à cliquer pour imprimer tes premiers documents. 📄",
     "log.incident": "Petit incident de production. La qualité baisse légèrement.",
     "log.optimization": "Optimisation imprévue : tu réduis un peu ton empreinte papier.",
     "log.buyBuilding": "Tu achètes {{name}} (total : {{total}}).",
