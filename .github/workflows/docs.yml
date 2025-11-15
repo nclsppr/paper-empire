@@ -23,11 +23,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
+      
+      # Build de la documentation
       - run: npm install
       - run: npm run docs:build
+      
+      # Créer la structure finale
+      - name: Prepare deployment directory
+        run: |
+          mkdir -p _site
+          # Copier votre index.html et autres fichiers racine
+          cp index.html _site/
+          # Copier d'autres fichiers/dossiers à la racine si nécessaire
+          # cp -r assets _site/ (exemple)
+          
+          # Copier la doc dans le sous-répertoire /docs
+          mkdir -p _site/docs
+          cp -r docs-site/* _site/docs/
+      
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: docs-site
+          path: _site
 
   deploy:
     needs: build
