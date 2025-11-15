@@ -1,0 +1,8 @@
+input: docs
+output: docs-site
+branding:
+  title: Victor Buck Tycoon Docs
+  label: v0.6
+links:
+  - text: Game Repo
+    link: https://github.com/nclsppr/paper-empire

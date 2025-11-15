@@ -4,12 +4,12 @@
 
 - `victorzoo.html`: Main game entry point (HTML, CSS, JS in one file).
 - `game-design.md`: Design notes, mechanics, and future ideas.
-- `README.md`: High‑level overview and setup notes.
+- `README.md`: High‑level overview and setup notes (now housed in `docs/`).
 - Keep any new assets (images, audio, data) in a clearly named folder at the repo root (e.g., `assets/`, `data/`).
 
 ## Work Log & Versioning Expectations
 
-- Each time you work on the project, record what you did and bump the version in the "Versioned Change History" section of `README.md` when the change is meaningful.
+- Each time you work on the project, record what you did and bump the version in the "Versioned Change History" section of `docs/README.md` when the change is meaningful.
 - Use short, clear entries (e.g., `0.2 – add new character events`, `0.3 – balance printing jobs and rewards`).
 - If you touch multiple areas, summarize them together in one version entry instead of creating many tiny versions.
 - When a change represents a proper release (e.g., multiple features, major UX updates, or refactors), add a matching entry in `RELEASE_NOTES.md`. Document the release number, date, and a concise bullet list of highlights. Keep `README.md`’s history in sync with the same release number for quick reference.
