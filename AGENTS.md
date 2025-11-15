@@ -12,6 +12,7 @@
 - Each time you work on the project, record what you did and bump the version in the "Versioned Change History" section of `README.md` when the change is meaningful.
 - Use short, clear entries (e.g., `0.2 – add new character events`, `0.3 – balance printing jobs and rewards`).
 - If you touch multiple areas, summarize them together in one version entry instead of creating many tiny versions.
+- When a change represents a proper release (e.g., multiple features, major UX updates, or refactors), add a matching entry in `RELEASE_NOTES.md`. Document the release number, date, and a concise bullet list of highlights. Keep `README.md`’s history in sync with the same release number for quick reference.
 
 ## Build, Test, and Development Commands
 

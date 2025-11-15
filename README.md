@@ -15,5 +15,6 @@ Track meaningful milestones in the project:
 - **0.3** – Stabilise production modifiers, surface their impact in the UI, and add targeted unit tests.
 - **0.4** – Introduce the hidden “renard” god mode with time-scaling controls and supporting tests.
 - **0.5** – Split the UI into modular assets, cache DOM references for better performance, and add extensive inline documentation plus project-wide docs.
+- **0.6** – Externalise i18n, add German/Luxembourgish, refresh the mobile UI (sticky header, ripple, layout fixes), and add Playwright layout tests. See `RELEASE_NOTES.md` for details.
 
 When you make notable changes (new features, mechanics, UI improvements), append a new entry with an incremented version number and a short description of what changed.
