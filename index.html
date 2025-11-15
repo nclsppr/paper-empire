@@ -65,16 +65,17 @@
     <div class="header-tagline" data-i18n="app.tagline"></div>
   </div>
 </header>
-<div class="event-banner hidden" id="eventBanner" aria-live="polite">
-  <div class="event-banner-icon" id="eventBannerEmoji" aria-hidden="true">🔔</div>
-  <div class="event-banner-body">
-    <div id="eventBannerText"></div>
-  </div>
-  <button class="event-banner-close" id="closeEventBanner" aria-label="Fermer">
-    <span aria-hidden="true">×</span>
-  </button>
-</div>
+
 <main id="mainContent" class="app" role="main">
+  <div class="event-banner hidden" id="eventBanner" aria-live="polite">
+    <div class="event-banner-icon" id="eventBannerEmoji" aria-hidden="true">🔔</div>
+    <div class="event-banner-body">
+      <div id="eventBannerText"></div>
+    </div>
+    <button class="event-banner-close" id="closeEventBanner" aria-label="Fermer">
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
   <!-- Colonne gauche: clic + stats -->
   <div class="layout-column" aria-label="Production et clics automatiques">
     <div class="card" role="region" aria-label="Stats principales">
@@ -177,7 +178,6 @@
 
     <div class="card progress-card" role="region" aria-label="Progression, sauvegarde et accessibilité">
       <h2 data-i18n="sections.progressTitle"></h2>
-      <p class="small" data-i18n="sections.settingsHint"></p>
       <div class="achievements-list" id="achievementsList" aria-live="polite"></div>
     </div>
 
@@ -262,6 +262,10 @@
       <label class="option-row">
         <input type="checkbox" id="toggleTutorial">
         <span data-i18n="settings.tutorial"></span>
+      </label>
+      <label class="option-row">
+        <input type="checkbox" id="toggleEvents">
+        <span data-i18n="settings.events"></span>
       </label>
       <button class="btn-slim" type="button" id="restartTutorialBtn" data-i18n="settings.restartTutorial"></button>
     </div>

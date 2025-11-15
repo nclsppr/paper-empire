@@ -79,7 +79,8 @@
     modalCanClose: false,
     bannerTone: "mixed",
     bannerKey: null,
-    bannerParams: null
+    bannerParams: null,
+    eventsEnabled: true
   };
 
   const contractsState = {
@@ -274,6 +275,7 @@
     cacheDomReferences();
     bindUIEvents();
     initLocalization();
+    eventState.eventsEnabled = areEventsAllowed();
     initGame();
     initGodModeControls();
     initTutorialGuidance();
@@ -987,6 +989,7 @@
 
   /** Applies resource gains, drifts and unlock checks for a time delta. */
   function update(dt) {
+    syncEventsPreference();
     const DOCps = computeDocPerSecond();
     const mults = computeMultipliers();
 
@@ -1023,6 +1026,7 @@
 
   /** introduces occasional incidents/optimisations to keep gauges dynamic. */
   function maybeSpawnSmallEvents(dt) {
+    if (!eventState.eventsEnabled) return;
     const DOCps = computeDocPerSecond();
     const risk = Math.min(0.0005 * DOCps, 0.05);
     if (Math.random() < risk * dt) {
@@ -1266,7 +1270,28 @@
     return "🔔";
   }
 
+  function areEventsAllowed() {
+    if (!Settings || typeof Settings.getPreference !== "function") {
+      return true;
+    }
+    return Settings.getPreference("eventsEnabled") !== false;
+  }
+
+  function syncEventsPreference() {
+    const allowed = areEventsAllowed();
+    if (eventState.eventsEnabled === allowed) return;
+    eventState.eventsEnabled = allowed;
+    if (!allowed) {
+      if (window.Events && typeof window.Events.cancelActive === "function") {
+        window.Events.cancelActive();
+      }
+      closeEventModal(true);
+      hideEventBanner();
+    }
+  }
+
   function checkDynamicEvents(dt) {
+    if (!eventState.eventsEnabled) return;
     if (!window.Events) return;
     const newEvent = Events.tick(gameState, dt);
     if (newEvent) {
@@ -1276,6 +1301,7 @@
   }
 
   function handleEventSpawn(eventDef) {
+    if (!eventState.eventsEnabled) return;
     eventState.active = eventDef;
     eventState.modalCanClose = false;
     showEventModal(eventDef);

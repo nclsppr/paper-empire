@@ -7,7 +7,8 @@
     soundsEnabled: true,
     particlesEnabled: true,
     tutorialEnabled: true,
-    tutorialCompleted: false
+    tutorialCompleted: false,
+    eventsEnabled: true
   };
 
   function loadPrefs() {
@@ -62,6 +63,7 @@
     wireToggle("toggleSounds", "soundsEnabled", prefs);
     wireToggle("toggleParticles", "particlesEnabled", prefs);
     wireToggle("toggleTutorial", "tutorialEnabled", prefs);
+    wireToggle("toggleEvents", "eventsEnabled", prefs);
     refreshToggles();
   }
 

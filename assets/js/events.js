@@ -205,6 +205,12 @@
     return { resultKey, success, tone };
   }
 
+  function cancelActive() {
+    activeEvent = null;
+    minigameCode = null;
+    cooldown = MIN_COOLDOWN;
+  }
+
   function getActiveEvent() {
     return activeEvent;
   }
@@ -223,6 +229,7 @@
     startMinigame,
     resolveMinigame,
     getActiveEvent,
-    debugForceEvent
+    debugForceEvent,
+    cancelActive
   };
 })();

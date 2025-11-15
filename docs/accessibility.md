@@ -7,7 +7,7 @@ The ⚙️ button opens a modal built with four sections. All controls are nativ
 
 - **Accessibility tab:** toggles for high contrast, large text (bumps the `:root` font-size), and reduced motion. Each option simply flips a `pref-*` class and is applied before `app.js` renders to avoid flashes.
 - **Audio tab:** enables or disables UI bleeps produced by `ui-effects.js`. The toggle maps to `documentElement.dataset.soundsEnabled` so other modules can respect it without reading storage.
-- **Interface tab:** controls the particle layer and the guided tutorial. Players can re-run the tutorial at any time through the “Restart tutorial” button.
+- **Interface tab:** controls the particle layer, the guided tutorial, and a toggle that pauses narrative events entirely. Players can re-run the tutorial at any time through the “Restart tutorial” button.
 - **Save tab:** houses export/import/reset buttons so keyboard users can access them without scrolling through the right column.
 
 ## Visual & Audio Feedback
