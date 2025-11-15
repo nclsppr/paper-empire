@@ -68,6 +68,12 @@
     modalCanClose: false
   };
 
+  const contractsState = {
+    available: [],
+    rerollCount: 0,
+    lastReroll: 0
+  };
+
   let saveTimer = null;
 
   /** Static blueprint for every building available in the MVP. */
@@ -422,6 +428,7 @@
       DOM.langSelect.value = lang;
     }
     applyStaticTranslations();
+    renderContractsPanel();
     if (navigator.language && navigator.language.slice(0, 2).toLowerCase() !== lang) {
       document.documentElement.setAttribute("lang", lang);
     }
@@ -486,6 +493,12 @@
     ];
 
     applyPersistedState(Persistence.load ? Persistence.load() : null);
+
+    if (window.EndgameModule) {
+      window.EndgameModule.loadData().then(() => {
+        renderContractsPanel();
+      });
+    }
 
     uiState.buildingsDirty = true;
     uiState.upgradesDirty = true;
@@ -1044,6 +1057,90 @@
     DOM.closeEventModal.removeAttribute("aria-disabled");
   }
 
+  function renderContractsPanel() {
+    if (!window.EndgameModule) return;
+    if (!DOM.contractsList || !DOM.activeContractPanel) return;
+    contractsState.available = window.EndgameModule.availableContracts(gameState);
+    DOM.contractsList.innerHTML = "";
+    if (!contractsState.available.length) {
+      const empty = document.createElement("div");
+      empty.className = "small";
+      empty.textContent = t("contracts.noneAvailable");
+      DOM.contractsList.appendChild(empty);
+    } else {
+      for (const contract of contractsState.available) {
+        const card = document.createElement("div");
+        card.className = "contract-card";
+        card.innerHTML = `
+          <strong>${t(contract.nameKey)}</strong>
+          <div>${t(contract.descKey)}</div>
+          <div class="contract-requirements">${t("contracts.requirements", {
+            quality: Math.round((contract.requirements.quality || 0) * 100),
+            image: Math.round((contract.requirements.image || 0) * 100),
+            volume: formatNumber(contract.requirements.volume || 0)
+          })}</div>
+        `;
+        const actions = document.createElement("div");
+        actions.className = "contract-actions";
+        const btn = document.createElement("button");
+        btn.className = "btn-slim";
+        btn.dataset.contract = contract.id;
+        btn.textContent = t("contracts.start");
+        actions.appendChild(btn);
+        card.appendChild(actions);
+        DOM.contractsList.appendChild(card);
+      }
+      DOM.contractsList.querySelectorAll("[data-contract]").forEach(btn => {
+        btn.addEventListener("click", () => startContract(btn.dataset.contract));
+      });
+    }
+    renderActiveContract();
+  }
+
+  function startContract(contractId) {
+    if (!window.EndgameModule) return;
+    const success = window.EndgameModule.startContract(contractId);
+    if (!success) {
+      alert(t("contracts.alreadyRunning"));
+      return;
+    }
+    addNewsEntry("contracts.news.started", { name: t(`contracts.${contractId}.title`, {}, contractId) });
+    renderActiveContract();
+  }
+
+  function renderActiveContract() {
+    if (!window.EndgameModule || !DOM.activeContractPanel) return;
+    const { activeContract } = window.EndgameModule;
+    if (!activeContract.current) {
+      DOM.activeContractPanel.classList.add("hidden");
+      DOM.activeContractPanel.innerHTML = "";
+      return;
+    }
+    DOM.activeContractPanel.classList.remove("hidden");
+    DOM.activeContractPanel.innerHTML = `
+      <div><strong>${t(activeContract.current.nameKey)}</strong></div>
+      <div>${t("contracts.remaining", { seconds: Math.ceil(activeContract.timer) })}</div>
+      <div>${t("contracts.reward", {
+        doc: formatNumber(activeContract.current.reward.doc || 0),
+        cc: formatNumber(activeContract.current.reward.cc || 0),
+        cards: activeContract.current.reward.cards || 0
+      })}</div>
+    `;
+  }
+
+  function tickContracts(dt) {
+    if (!window.EndgameModule) return;
+    const result = window.EndgameModule.tickContract(dt, gameState);
+    if (result) {
+      addNewsEntry("contracts.news.completed", { name: t(result.nameKey) });
+      logMessage("log.contractComplete", { name: t(result.nameKey) });
+      renderActiveContract();
+      queueSave(true);
+    } else {
+      renderActiveContract();
+    }
+  }
+
   function handleMinigameResponse(event) {
     const btn = event.target.closest("[data-minigame-response]");
     if (!btn) return;
@@ -1317,6 +1414,7 @@
     renderPrestige();
     renderLog();
     renderNews();
+    renderContractsPanel();
     renderAchievementsPanel();
     renderGodModePanel();
     syncBuildingUnlocks();

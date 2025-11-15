@@ -146,9 +146,19 @@
       </div>
     </div>
 
-    <div class="card" role="region" aria-label="Journal">
-      <h2 data-i18n="sections.logTitle"></h2>
-      <div class="log-panel" id="logPanel" aria-live="polite"></div>
+    <div class="card tabs-card" role="region" aria-label="Contrats et journal">
+      <div class="tabs-header">
+        <button class="tab-btn active" data-tab="contracts" id="contractsTab" data-i18n="sections.contractsTitle"></button>
+        <button class="tab-btn" data-tab="journal" id="journalTab" data-i18n="sections.logTitle"></button>
+      </div>
+      <div class="tab-panel" id="contractsPanel">
+        <div class="contracts-list" id="contractsList"></div>
+        <div class="active-contract hidden" id="activeContractPanel"></div>
+        <button class="btn-slim" id="rerollContractsBtn" data-i18n="actions.rerollContracts"></button>
+      </div>
+      <div class="tab-panel hidden" id="journalPanel">
+        <div class="log-panel" id="logPanel" aria-live="polite"></div>
+      </div>
     </div>
 
     <div class="card news-card" role="region" aria-label="Actualités">
@@ -224,6 +234,7 @@
   <script src="assets/i18n/lb.js"></script>
   <script src="assets/js/persistence.js"></script>
   <script src="assets/js/achievements.js"></script>
+  <script src="assets/js/endgame.js"></script>
   <script src="assets/js/events.js"></script>
   <script src="assets/js/modifier-utils.js"></script>
   <script src="assets/js/godmode-utils.js"></script>
