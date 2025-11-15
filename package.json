@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test:unit": "node tests/modifiers.test.js && node tests/godmode.test.js",
+    "test:unit": "node tests/modifiers.test.js && node tests/godmode.test.js && node tests/i18n.test.js",
     "test:e2e": "playwright test",
     "test": "npm run test:unit && npm run test:e2e",
     "docs:build": "retype build docs --output docs-site"
