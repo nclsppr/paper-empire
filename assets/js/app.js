@@ -391,6 +391,9 @@
       DOM.langSelect.value = lang;
     }
     applyStaticTranslations();
+    if (navigator.language && navigator.language.slice(0, 2).toLowerCase() !== lang) {
+      document.documentElement.setAttribute("lang", lang);
+    }
     uiState.buildingsDirty = true;
     uiState.upgradesDirty = true;
     renderAll(true);

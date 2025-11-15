@@ -44,7 +44,8 @@
   </script>
 </head>
 <body>
-<header class="app-header">
+<a class="skip-link" href="#mainContent" data-i18n="actions.skipToContent"></a>
+<header class="app-header" role="banner">
   <div class="header-inner">
     <div class="header-top">
       <div class="header-title" data-game-title></div>
@@ -57,11 +58,12 @@
     </div>
     <div class="header-tagline" data-i18n="app.tagline"></div>
   </div>
+  </div>
 </header>
-<div class="app">
+<main id="mainContent" class="app" role="main">
   <!-- Colonne gauche: clic + stats -->
-  <div class="layout-column">
-    <div class="card">
+  <div class="layout-column" aria-label="Production et clics automatiques">
+    <div class="card" role="region" aria-label="Stats principales">
       <div class="stats-main">
         <div class="stat-line">
           <span class="stat-label" data-i18n="stats.docBank"></span>
@@ -123,15 +125,15 @@
   </div>
 
   <!-- Colonne centre: bâtiments -->
-  <div class="card">
+  <div class="card" role="region" aria-label="Bâtiments">
     <h2 data-i18n="sections.buildingsTitle"></h2>
     <div class="small" data-i18n="sections.buildingsHint"></div>
     <div class="buildings-list" id="buildingsList"></div>
   </div>
 
   <!-- Colonne droite: upgrades, prestige, log -->
-  <div class="layout-column">
-    <div class="card">
+  <div class="layout-column" aria-label="Améliorations et progression">
+    <div class="card" role="region" aria-label="Améliorations">
       <h2 data-i18n="sections.upgradesTitle"></h2>
       <div class="section">
         <div class="small" data-i18n="sections.upgradesHint"></div>
@@ -144,19 +146,36 @@
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" role="region" aria-label="Journal">
       <h2 data-i18n="sections.logTitle"></h2>
-      <div class="log-panel" id="logPanel"></div>
+      <div class="log-panel" id="logPanel" aria-live="polite"></div>
     </div>
 
-    <div class="card progress-card">
+    <div class="card progress-card" role="region" aria-label="Progression, sauvegarde et accessibilité">
       <h2 data-i18n="sections.progressTitle"></h2>
       <div class="progress-actions">
         <button class="btn-slim" id="exportSaveBtn" data-i18n="actions.exportSave"></button>
         <button class="btn-slim" id="importSaveBtn" data-i18n="actions.importSave"></button>
         <button class="btn-slim danger" id="resetSaveBtn" data-i18n="actions.resetSave"></button>
       </div>
-      <div class="achievements-list" id="achievementsList"></div>
+      <details class="accessibility-panel">
+        <summary data-i18n="sections.accessibilityTitle"></summary>
+        <div class="accessibility-options">
+          <label class="option-row">
+            <input type="checkbox" id="toggleHighContrast">
+            <span data-i18n="accessibility.highContrast"></span>
+          </label>
+          <label class="option-row">
+            <input type="checkbox" id="toggleLargeText">
+            <span data-i18n="accessibility.largeText"></span>
+          </label>
+          <label class="option-row">
+            <input type="checkbox" id="toggleReduceMotion">
+            <span data-i18n="accessibility.reduceMotion"></span>
+          </label>
+        </div>
+      </details>
+      <div class="achievements-list" id="achievementsList" aria-live="polite"></div>
     </div>
 
     <div class="card god-mode-card hidden" id="godModeCard" aria-hidden="true">
@@ -171,7 +190,7 @@
       </div>
     </div>
   </div>
-</div>
+</main>
 
   <script src="assets/i18n/fr.js"></script>
   <script src="assets/i18n/en.js"></script>
@@ -181,6 +200,7 @@
   <script src="assets/js/achievements.js"></script>
   <script src="assets/js/modifier-utils.js"></script>
   <script src="assets/js/godmode-utils.js"></script>
+  <script src="assets/js/accessibility.js"></script>
   <script src="assets/js/app.js" defer></script>
 </body>
 </html>
