@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Victor Buck Tycoon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div class="app">
+  <!-- Colonne gauche: clic + stats -->
+  <div class="layout-column">
+    <div class="card">
+      <div class="flex-row">
+        <h1 data-i18n="app.title"></h1>
+        <select id="langSelect" class="lang-select">
+          <option value="fr">FR</option>
+          <option value="en">EN</option>
+        </select>
+      </div>
+      <div class="subtitle" data-i18n="app.tagline"></div>
+
+      <div class="stats-main">
+        <div class="stat-line">
+          <span class="stat-label" data-i18n="stats.docBank"></span>
+          <span class="stat-value big-number" id="docBank">0</span>
+        </div>
+        <div class="stat-line">
+          <span class="stat-label" data-i18n="stats.docTotal"></span>
+          <span class="stat-value" id="docTotal">0</span>
+        </div>
+        <div class="stat-line">
+          <span class="stat-label" data-i18n="stats.ccTotal"></span>
+          <span class="stat-value" id="ccTotal">0</span>
+        </div>
+        <div class="stat-line">
+          <span class="stat-label" data-i18n="stats.docPs"></span>
+          <span class="stat-value" id="docPs">0 DOC/s</span>
+        </div>
+      </div>
+
+      <button class="click-button" id="clickButton">
+        <span data-i18n="actions.printDocument"></span> <span aria-hidden="true">🖨️</span>
+      </button>
+
+      <div class="gauges">
+        <div class="gauge">
+          <div class="gauge-label-row">
+            <span data-i18n="gauges.quality"></span>
+            <span id="qualityLabel">50 %</span>
+          </div>
+          <div class="gauge-bar">
+            <div class="gauge-fill" id="qualityFill"></div>
+          </div>
+        </div>
+        <div class="gauge">
+          <div class="gauge-label-row">
+            <span data-i18n="gauges.footprint"></span>
+            <span id="footprintLabel">50 %</span>
+          </div>
+          <div class="gauge-bar">
+            <div class="gauge-fill bad" id="footprintFill"></div>
+          </div>
+        </div>
+        <div class="gauge">
+          <div class="gauge-label-row">
+            <span data-i18n="gauges.image"></span>
+            <span id="imageLabel">50 %</span>
+          </div>
+          <div class="gauge-bar">
+            <div class="gauge-fill" id="imageFill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chips-row">
+        <span class="tag"><span data-i18n="chips.culture"></span> <span id="culturePoints">0</span></span>
+        <span class="tag"><span data-i18n="chips.prestige"></span> <span id="prestigeMult">1.00</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colonne centre: bâtiments -->
+  <div class="card">
+    <h2 data-i18n="sections.buildingsTitle"></h2>
+    <div class="small" data-i18n="sections.buildingsHint"></div>
+    <div class="buildings-list" id="buildingsList"></div>
+  </div>
+
+  <!-- Colonne droite: upgrades, prestige, log -->
+  <div class="layout-column">
+    <div class="card">
+      <h2 data-i18n="sections.upgradesTitle"></h2>
+      <div class="section">
+        <div class="small" data-i18n="sections.upgradesHint"></div>
+        <div class="upgrades-list" id="upgradesList"></div>
+      </div>
+      <div class="prestige-card">
+        <div><strong data-i18n="sections.prestigeTitle"></strong></div>
+        <div id="prestigeInfo"></div>
+        <button class="btn-prestige disabled" id="prestigeButton"></button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="sections.logTitle"></h2>
+      <div class="log-panel" id="logPanel"></div>
+    </div>
+
+    <div class="card god-mode-card hidden" id="godModeCard" aria-hidden="true">
+      <h2 data-i18n="sections.godModeTitle"></h2>
+      <div class="small" data-i18n="godMode.hint"></div>
+      <div class="god-mode-status" id="godModeStatus"></div>
+      <div class="god-mode-buttons">
+        <button class="btn-god-mode" data-god-scale="1">x1</button>
+        <button class="btn-god-mode" data-god-scale="10">x10</button>
+        <button class="btn-god-mode" data-god-scale="100">x100</button>
+        <button class="btn-god-mode" data-god-scale="1000">x1000</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script src="assets/js/modifier-utils.js"></script>
+  <script src="assets/js/godmode-utils.js"></script>
+  <script src="assets/js/app.js" defer></script>
+</body>
+</html>
